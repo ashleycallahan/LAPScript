@@ -100,7 +100,7 @@
             if (this.status === 200) {
                 var blob = this.response;
                 var blobURL = URL.createObjectURL(blob);
-                $(pageLink).parent().append('<a href="' + blobURL + '" target="_blank" style="display:block;margin:10px 0 0 0;" class="review-mode-added"><img src="' + blobURL + '" style="max-width:200px"></a>');
+                $(pageLink).parent().append('<a href="' + blobURL + '" target="_blank" style="display:block;margin:10px 0 0 0;" class="review-mode-added"><img src="' + blobURL + '" style="max-width:200px" alt="Thumbnail for screen: ' + $(pageLink).text().trim() + '"></a>');
             } else {}
         }
         xhr.onerror = function() {};
