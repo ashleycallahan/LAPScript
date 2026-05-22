@@ -101,7 +101,7 @@
             if (this.status === 200) {
                 var blob = this.response;
                 var blobURL = URL.createObjectURL(blob);
-                $(pageLink).parent().append('<a href="' + blobURL + '" target="_blank" style="display:block;margin:10px 0 0 0;" class="review-mode-added"><img src="' + blobURL + '" style="max-width:200px" alt="Thumbnail for screen: ' + $(pageLink).text().trim() + '"></a>');
+                $(pageLink).parent().append('<a href="' + blobURL + '" target="_blank" style="display:block;margin:10px 0 0 0;" class="review-mode-added"><img src="' + blobURL + '" style="min-width:200px;max-width:200px;max-height:200px;" alt="Thumbnail for screen: ' + $(pageLink).text().trim() + '"></a>');
             } else {}
         }
         xhr.onerror = function() {};
@@ -125,7 +125,7 @@
             var findingRow = finding.closest('tr');
             var attachments = findingRow.find('.attachments-container').first();
             if (window.findings[i].attachments.length > 0) {
-                attachments.html('<a class="review-mode-replaced" href="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" target="_blank" style="display:block"><img src="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" alt="' + window.findings[i].attachments[0].altText + '" style="height:auto;max-width:200px" /></a>');
+                attachments.html('<a class="review-mode-replaced" href="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" target="_blank" style="display:block"><img src="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" alt="' + window.findings[i].attachments[0].altText + '" style="min-width:200px;max-width:200px;max-height:200px;" /></a>');
             }
         }
     }
