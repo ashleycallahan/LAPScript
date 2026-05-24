@@ -75,6 +75,9 @@ a.review-mode-new-tab-link-added svg {
     margin-top: -3px;
     width: 16px;
 }
+app-issue-table-column-selector .my-auto {
+    display: none;
+}
     `);
 })();
 (function() {
@@ -193,6 +196,7 @@ a.review-mode-new-tab-link-added svg {
         if ($('[id="review-mode-toggle-table"]').length === 0) {
             $('[id="export-findings-button"]').after('<button id="review-mode-toggle-table" class="btn btn-outline-primary fw-bold review-mode-toggle-table-expand"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 640 640" aria-hidden="true"><path d="M264 96L120 96C106.7 96 96 106.7 96 120L96 264C96 273.7 101.8 282.5 110.8 286.2C119.8 289.9 130.1 287.8 137 281L177 241L256 320L177 399L137 359C130.1 352.1 119.8 350.1 110.8 353.8C101.8 357.5 96 366.3 96 376L96 520C96 533.3 106.7 544 120 544L264 544C273.7 544 282.5 538.2 286.2 529.2C289.9 520.2 287.9 509.9 281 503L241 463L320 384L399 463L359 503C352.1 509.9 350.1 520.2 353.8 529.2C357.5 538.2 366.3 544 376 544L520 544C533.3 544 544 533.3 544 520L544 376C544 366.3 538.2 357.5 529.2 353.8C520.2 350.1 509.9 352.1 503 359L463 399L384 320L463 241L503 281C509.9 287.9 520.2 289.9 529.2 286.2C538.2 282.5 544 273.7 544 264L544 120C544 106.7 533.3 96 520 96L376 96C366.3 96 357.5 101.8 353.8 110.8C350.1 119.8 352.2 130.1 359 137L399 177L320 256L241 177L281 137C287.9 130.1 289.9 119.8 286.2 110.8C282.5 101.8 273.7 96 264 96z"/></svg> Expand Table</button>');
         }
+        $('app-issue-table-column-selector input[type="checkbox"][disabled]').removeAttr('disabled');
         for (var i = 0; i <= window.findings.length; i++) {
             var finding = $('app-manual-eval-findings-table a[routerlink="./' + window.findings[i].issueId + '/view"]').first();
             var findingRow = finding.closest('tr');
@@ -213,6 +217,11 @@ a.review-mode-new-tab-link-added svg {
             $(this).addClass('review-mode-toggle-table-expand').removeClass('review-mode-toggle-table-collapse');
             $(this).html('<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 640 640" aria-hidden="true"><path d="M264 96L120 96C106.7 96 96 106.7 96 120L96 264C96 273.7 101.8 282.5 110.8 286.2C119.8 289.9 130.1 287.8 137 281L177 241L256 320L177 399L137 359C130.1 352.1 119.8 350.1 110.8 353.8C101.8 357.5 96 366.3 96 376L96 520C96 533.3 106.7 544 120 544L264 544C273.7 544 282.5 538.2 286.2 529.2C289.9 520.2 287.9 509.9 281 503L241 463L320 384L399 463L359 503C352.1 509.9 350.1 520.2 353.8 529.2C357.5 538.2 366.3 544 376 544L520 544C533.3 544 544 533.3 544 520L544 376C544 366.3 538.2 357.5 529.2 353.8C520.2 350.1 509.9 352.1 503 359L463 399L384 320L463 241L503 281C509.9 287.9 520.2 289.9 529.2 286.2C538.2 282.5 544 273.7 544 264L544 120C544 106.7 533.3 96 520 96L376 96C366.3 96 357.5 101.8 353.8 110.8C350.1 119.8 352.2 130.1 359 137L399 177L320 256L241 177L281 137C287.9 130.1 289.9 119.8 286.2 110.8C282.5 101.8 273.7 96 264 96z"/></svg> Expand Table');
         }
+    });
+    $(document).on('click', 'app-issue-table-column-selector input[type="checkbox"]', function() {
+        setTimeout(function() {
+            $('app-issue-table-column-selector input[type="checkbox"][disabled]').removeAttr('disabled');
+        }, 100);
     });
 
 })();
