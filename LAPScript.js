@@ -141,9 +141,9 @@ app-issue-table-column-selector .my-auto {
             for (const mutation of mutationList) {
 
                 // FINDINGS
-                if ($('app-manual-eval-findings-table').find('a[routerlink]').length > 0) {
+                if ($('app-manual-eval-findings-table').find('table a[routerlink]').length > 0) {
                     //observer.disconnect();
-                    if ($(mutation.target).hasClass('attachments-container') === false) {
+                    if ($('.review-mode-replaced').length === 0) {
                         window.replaceAttachments();
                     }
                 }
@@ -223,11 +223,13 @@ app-issue-table-column-selector .my-auto {
         }
         $('app-issue-table-column-selector input[type="checkbox"][disabled]').removeAttr('disabled');
         for (var i = 0; i <= window.findings.length; i++) {
-            var finding = $('app-manual-eval-findings-table a[routerlink="./' + window.findings[i].issueId + '/view"]').first();
-            var findingRow = finding.closest('tr');
-            var attachments = findingRow.find('.attachments-container').first();
-            if (window.findings[i].attachments.length > 0) {
-                attachments.html('<a class="review-mode-replaced" href="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" target="_blank" style="display:block"><img src="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" alt="' + window.findings[i].attachments[0].altText + '" style="min-width:200px;max-width:200px;max-height:200px;" /></a>');
+            if (typeof window.findings[i] !== 'undefined') {
+                var finding = $('app-manual-eval-findings-table a[routerlink="./' + window.findings[i].issueId + '/view"]').first();
+                var findingRow = finding.closest('tr');
+                var attachments = findingRow.find('.attachments-container').first();
+                if (window.findings[i].attachments.length > 0) {
+                    attachments.html('<a class="review-mode-replaced" href="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" target="_blank" style="display:block"><img src="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" alt="' + window.findings[i].attachments[0].altText + '" style="min-width:200px;max-width:200px;max-height:200px;" /></a>');
+                }
             }
         }
     }
@@ -242,9 +244,9 @@ app-issue-table-column-selector .my-auto {
         try {
             var successful = document.execCommand('copy');
             var msg = successful ? 'successful' : 'unsuccessful';
-            console.log('Fallback: Copying text command was ' + msg);
+            //console.log('Fallback: Copying text command was ' + msg);
         } catch (err) {
-            console.error('Fallback: Oops, unable to copy', err);
+            //console.error('Fallback: Oops, unable to copy', err);
         }
         selection.removeAllRanges();
         $('body').removeClass('review-mode-findings-excel');
