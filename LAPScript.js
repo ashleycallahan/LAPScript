@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.1
+// @version      1.1.2
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -159,22 +159,19 @@ app-issue-table-column-selector .my-auto {
 
     function watchPage() {
         const callback = (mutationList, observer) => {
-            for (const mutation of mutationList) {
-
-                // FINDINGS
-                if ($('app-manual-eval-findings-table').find('table a[routerlink]').length > 0) {
-                    //observer.disconnect();
-                    if ($('.review-mode-replaced').length === 0) {
-                        window.replaceAttachments();
-                    }
+            // FINDINGS
+            if ($('app-manual-eval-findings-table').find('table a[routerlink]').length > 0) {
+                //observer.disconnect();
+                if ($('.review-mode-replaced').length === 0) {
+                    window.replaceAttachments();
                 }
+            }
 
-                // SCREENS
-                if ($('app-manual-evaluation-report').find('table a[routerlink]').length > 0) {
-                    //observer.disconnect();
-                    if ($('.review-mode-added').length === 0) {
-                        window.addScreenImg();
-                    }
+            // SCREENS
+            if ($('app-manual-evaluation-report').find('table a[routerlink]').length > 0) {
+                //observer.disconnect();
+                if ($('.review-mode-added').length === 0) {
+                    window.addScreenImg();
                 }
             }
         };
