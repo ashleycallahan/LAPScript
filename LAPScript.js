@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.3
+// @version      1.1.4
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -233,7 +233,7 @@ select.review-mode-screen-select {
         }
         if (filterByScreenVal !== '') {
             if ($('h3.review-mode-screen-name-added').length === 0) {
-                $('app-manual-eval-findings-table').prepend('<h3 class="review-mode-screen-name-added"></h3>');
+                $('app-manual-eval-findings-table').before('<h3 class="review-mode-screen-name-added"></h3>');
             }
             $('h3.review-mode-screen-name-added').html(filterByScreenVal);
         }
@@ -268,7 +268,7 @@ select.review-mode-screen-select {
         if (typeof window.screens !== 'undefined') {
             if (filterByScreen.length > 0) {
                 if (filterByScreen.parent().find('.review-mode-screen-select').length === 0) {
-                    filterByScreenLabel.after('<select class="review-mode-screen-select"><option></option></select>');
+                    filterByScreenLabel.after('<select class="review-mode-screen-select" aria-label="Screen"><option></option></select>');
                 }
                 for (let i = 0; i < window.screens.length; i++) {
                     if (typeof window.screens[i].page !== 'undefined' && $('.review-mode-screen-select').find('option:contains(' + window.screens[i].page.name + ')').length === 0) {
