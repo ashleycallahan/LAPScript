@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.2
+// @version      1.1.3
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -72,7 +72,7 @@ app-manual-eval-findings-table table a[routerlink] svg {
 a.review-mode-new-tab-link-added svg {
     margin-top: -3px;
 }
-.review-mode-btn {
+.btn + .review-mode-btn {
     margin: 0 0 0 15px;
 }
 .review-mode-btn svg {
@@ -135,12 +135,11 @@ app-issue-table-column-selector .my-auto {
             var jsonResponse;
             if (contentType && contentType.indexOf('application/json') !== -1) {
                 jsonResponse = JSON.parse(this.responseText);
-                var i;
                 if (typeof jsonResponse.findings === 'object' && jsonResponse.findings.length > 0) {
                     if (typeof window.findings === 'undefined') {
                         window.findings = [];
                     }
-                    for (i = 0; i <= jsonResponse.findings.length; i++) {
+                    for (let i = 0; i <= jsonResponse.findings.length; i++) {
                         window.findings.push({
                             issueId: jsonResponse.findings[i].issueId,
                             attachments: jsonResponse.findings[i].attachment,
@@ -190,7 +189,7 @@ app-issue-table-column-selector .my-auto {
                 $(this).parent().append('<a href="' + $(this).attr('href') + '" target="_blank" class="review-mode-new-tab-link-added"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 640 640" role="img" aria-label="Open ' + $(this).text().trim() + ' in a new tab"><path d="M354.4 83.8C359.4 71.8 371.1 64 384 64L544 64C561.7 64 576 78.3 576 96L576 256C576 268.9 568.2 280.6 556.2 285.6C544.2 290.6 530.5 287.8 521.3 278.7L464 221.3L310.6 374.6C298.1 387.1 277.8 387.1 265.3 374.6C252.8 362.1 252.8 341.8 265.3 329.3L418.7 176L361.4 118.6C352.2 109.4 349.5 95.7 354.5 83.7zM64 240C64 195.8 99.8 160 144 160L224 160C241.7 160 256 174.3 256 192C256 209.7 241.7 224 224 224L144 224C135.2 224 128 231.2 128 240L128 496C128 504.8 135.2 512 144 512L400 512C408.8 512 416 504.8 416 496L416 416C416 398.3 430.3 384 448 384C465.7 384 480 398.3 480 416L480 496C480 540.2 444.2 576 400 576L144 576C99.8 576 64 540.2 64 496L64 240z"/></svg></a>');
             }
         });
-        for (var i = 0; i < window.screens.length; i++) {
+        for (let i = 0; i < window.screens.length; i++) {
             if (typeof window.screens[i].page !== 'undefined' && typeof window.screens[i].page.name !== 'undefined') {
                 var pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name + ')').first();
                 if (pageLink.length > 0 && $(pageLink).parent().find('.review-mode-added').length === 0 && typeof window.screens[i].page.screenshot.src !== 'undefined') {
@@ -219,14 +218,23 @@ app-issue-table-column-selector .my-auto {
         xhr.send();
     }
     window.replaceAttachments = function() {
-        var filterByScreen = $('app-filter-keyword label:contains("Screen")').next('input');
-        if (filterByScreen.length > 0 && filterByScreen.val() !== '') {
-            if ($('app-manual-eval-findings-table').find('h3.review-mode-screen-name-added').length === 0) {
-                $('app-manual-eval-findings-table').prepend('<h3 class="review-mode-screen-name-added">Page: ' + $('app-filter-keyword label:contains("Screen")').next('input').val() + '</h3>');
+        const filterByScreenLabel = $('app-filter-keyword label:contains("Screen")');
+        const filterByScreen = filterByScreenLabel.parent().find('input');
+        let filterByScreenVal = '';
+        if (filterByScreen.length > 0) {
+            filterByScreenVal = filterByScreen.val();
+        }
+        if (filterByScreen.length === 0 && window.location.search.indexOf('screen=') !== -1) {
+            filterByScreenVal = decodeURI(window.location.search.split('screen=')[1].split('&')[0]);
+        }
+        if (filterByScreenVal !== '') {
+            if ($('h3.review-mode-screen-name-added').length === 0) {
+                $('app-manual-eval-findings-table').prepend('<h3 class="review-mode-screen-name-added"></h3>');
             }
+            $('h3.review-mode-screen-name-added').html(filterByScreenVal);
         }
         else {
-            $('app-manual-eval-findings-table').find('h3.review-mode-screen-name-added').remove();
+            $('h3.review-mode-screen-name-added').remove();
         }
         $('app-manual-eval-findings-table a[routerlink]').each(function() {
             if ($(this).parent().find('.review-mode-new-tab-link-added').length === 0) {
@@ -240,13 +248,36 @@ app-issue-table-column-selector .my-auto {
             $('[id="export-findings-button"]').after('<button id="review-mode-toggle-table" class="review-mode-btn btn btn-outline-primary fw-bold review-mode-toggle-table-expand"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 640 640" aria-hidden="true"><path d="M264 96L120 96C106.7 96 96 106.7 96 120L96 264C96 273.7 101.8 282.5 110.8 286.2C119.8 289.9 130.1 287.8 137 281L177 241L256 320L177 399L137 359C130.1 352.1 119.8 350.1 110.8 353.8C101.8 357.5 96 366.3 96 376L96 520C96 533.3 106.7 544 120 544L264 544C273.7 544 282.5 538.2 286.2 529.2C289.9 520.2 287.9 509.9 281 503L241 463L320 384L399 463L359 503C352.1 509.9 350.1 520.2 353.8 529.2C357.5 538.2 366.3 544 376 544L520 544C533.3 544 544 533.3 544 520L544 376C544 366.3 538.2 357.5 529.2 353.8C520.2 350.1 509.9 352.1 503 359L463 399L384 320L463 241L503 281C509.9 287.9 520.2 289.9 529.2 286.2C538.2 282.5 544 273.7 544 264L544 120C544 106.7 533.3 96 520 96L376 96C366.3 96 357.5 101.8 353.8 110.8C350.1 119.8 352.2 130.1 359 137L399 177L320 256L241 177L281 137C287.9 130.1 289.9 119.8 286.2 110.8C282.5 101.8 273.7 96 264 96z"/></svg> Expand Table</button>');
         }
         $('app-issue-table-column-selector input[type="checkbox"][disabled]').removeAttr('disabled');
-        for (var i = 0; i <= window.findings.length; i++) {
+        for (let i = 0; i <= window.findings.length; i++) {
             if (typeof window.findings[i] !== 'undefined') {
-                var finding = $('app-manual-eval-findings-table a[routerlink="./' + window.findings[i].issueId + '/view"]').first();
-                var findingRow = finding.closest('tr');
-                var attachments = findingRow.find('.attachments-container').first();
+                let finding = $('app-manual-eval-findings-table a[routerlink="./' + window.findings[i].issueId + '/view"]').first();
+                let findingRow = finding.closest('tr');
+                let attachments = findingRow.find('.attachments-container').first();
                 if (window.findings[i].attachments.length > 0) {
                     attachments.html('<a class="review-mode-replaced" href="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" target="_blank"><img src="/api/v1/resources/' + window.findings[i].attachments[0].downloadToken + '/' + window.findings[i].attachments[0]._id + '" alt="' + window.findings[i].attachments[0].altText + '" /></a>');
+                }
+            }
+        }
+        if (typeof window.screens !== 'undefined') {
+            if (filterByScreen.length > 0) {
+                if (filterByScreen.parent().find('.review-mode-screen-select').length === 0) {
+                    filterByScreenLabel.after('<select class="review-mode-screen-select"><option></option></select>');
+                }
+                for (let i = 0; i < window.screens.length; i++) {
+                    if (typeof window.screens[i].page !== 'undefined' && $('.review-mode-screen-select').find('option:contains(' + window.screens[i].page.name + ')').length === 0) {
+                        $('.review-mode-screen-select').append('<option>' + window.screens[i].page.name + '</option>');
+                        if (filterByScreenVal === window.screens[i].page.name) {
+                            $('.review-mode-screen-select option:last-child').prop('selected', true);
+                        }
+                    }
+                }
+                if ($('.review-mode-screen-select option').length > 1) {
+                    $('.review-mode-screen-select').show();
+                    filterByScreen.hide();
+                }
+                else {
+                    $('.review-mode-screen-select').hide();
+                    filterByScreen.show();
                 }
             }
         }
@@ -285,6 +316,11 @@ app-issue-table-column-selector .my-auto {
         setTimeout(function() {
             $('app-issue-table-column-selector input[type="checkbox"][disabled]').removeAttr('disabled');
         }, 100);
+    });
+    $(document).on('change', '.review-mode-screen-select', function() {
+        $(this).parent().find('input').val($(this).val());
+        const inputEvent = new Event('input', { bubbles: true });
+        $(this).parent().find('input')[0].dispatchEvent(inputEvent);
     });
     $(document).on('click', '[id="review-mode-copy-table"]', function() {
        window.copyTable();
