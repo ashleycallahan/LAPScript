@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.5
+// @version      1.1.6
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -465,23 +465,27 @@ dialog.review-mode-lightbox .thumbnails img {
             }
         }
     }
-    window.copyTable = function() {
-        $('body').addClass('review-mode-findings-excel');
-        const element = document.querySelectorAll('app-manual-eval-findings-table table')[0];
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(element);
-        selection.removeAllRanges();
-        selection.addRange(range);
+    window.copyTable = async function() {
+        let element = $('app-manual-eval-findings-table table').clone();
+        $(element).addClass('review-mode-findings-excel').find('caption, th svg, a[routerlink] svg, th:first-child, td:first-child, .review-mode-link-added, .review-mode-link-lightbox').remove();
+        $(element).find('.attachments-container .review-mode-replaced').each(function() {
+            $(this).find('svg').remove();
+            $(this).find('img').css('height', '100px').css('width', '100px').attr('width', '100').attr('height', '100');
+            $(this).find('img').unwrap();
+        });
+        $(element).find('table-cell-text').each(function() {
+            $(this).find('span').html($(this).find('span').text().replace(/(\r\n|\n|\r)/g, '<br style="mso-data-placement:same-cell;">'));
+        });
+        const htmlBlob = new Blob([element[0].outerHTML], { type: "text/html" });
         try {
-            const successful = document.execCommand('copy');
-            const msg = successful ? 'successful' : 'unsuccessful';
-            //console.log('Fallback: Copying text command was ' + msg);
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    "text/html": htmlBlob
+                })
+            ]);
         } catch (err) {
-            //console.error('Fallback: Oops, unable to copy', err);
+            console.error("Rich copy failed: ", err);
         }
-        selection.removeAllRanges();
-        $('body').removeClass('review-mode-findings-excel');
     }
     window.reviewModeOpenLightbox = function(findingIndex) {
         $('body').append('<dialog class="review-mode-lightbox"><button class="review-mode-lightbox-close" aria-label="Close dialog"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM231 231C240.4 221.6 255.6 221.6 264.9 231L319.9 286L374.9 231C384.3 221.6 399.5 221.6 408.8 231C418.1 240.4 418.2 255.6 408.8 264.9L353.8 319.9L408.8 374.9C418.2 384.3 418.2 399.5 408.8 408.8C399.4 418.1 384.2 418.2 374.9 408.8L319.9 353.8L264.9 408.8C255.5 418.2 240.3 418.2 231 408.8C221.7 399.4 221.6 384.2 231 374.9L286 319.9L231 264.9C221.6 255.5 221.6 240.3 231 231z"/></svg></button></dialog>');
