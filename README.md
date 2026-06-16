@@ -17,10 +17,15 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 - Lightbox viewer for finding images.
 !["inline images with lightbox"](lapscript-lightbox.webp)
 - Copy table content in rich HTML format for spreadsheet workflows.
+!["Copy and paste table content into Excel"](lapscript-copy.webp)
 - Extra controls such as Refresh, Copy Table, Highlight Rows, and Expand/Collapse Table.
 !["Highlighting of rows"](lapscript-highlight-rows.png)
-- Search manual evaluations by Finding or Task ID.
-!["Search by Finding or Task ID"](lapscript-search.png)
+- View more than 6 columns of data for Findings.
+!["Choose as many columns as you like"](lapscript-columns.png)
+- Switch between screens from the Findings screen.
+!["Select screen"](lapscript-screen-switcher.png)
+- Search manual evaluations by Issue or Task ID.
+!["Search by Issue or Task ID"](lapscript-search.png)
 
 ## Requirements
 
