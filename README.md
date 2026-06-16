@@ -19,6 +19,8 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 - Copy table content in rich HTML format for spreadsheet workflows.
 - Extra controls such as Refresh, Copy Table, Highlight Rows, and Expand/Collapse Table.
 !["Highlighting of rows"](lapscript-highlight-rows.png)
+- Search manual evaluations by Finding or Task ID.
+!["Search by Finding or Task ID"](lapscript-search.png)
 
 ## Requirements
 
