@@ -10,6 +10,7 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 
 - Table enhancements for findings and screens views.
 - Inline screenshot/attachment previews in report tables.
+!["View description, URL, and screenshot on the screens tab"](lapscript-screens.png)
 - Quick links for opening items in new tabs.
 - Edit-in-dialog workflow for findings.
 !["Edit findings without leaving the screen"](lapscript-edit.png)
