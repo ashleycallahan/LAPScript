@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.6
+// @version      1.1.7
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -70,8 +70,10 @@ app-manual-eval-findings-table table td {
     white-space: normal !important;
     width: auto !important;
 }
-.btn + .review-mode-btn {
-    margin: 0 0 0 15px;
+.review-mode-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px 15px;
 }
 .review-mode-btn[aria-pressed="true"] {
     background: #e5e6f0 !important;
@@ -115,6 +117,8 @@ app-manual-eval-findings-table table td {
     right: 5px;
     width: 28px;
 }
+app-admin-manual-audits table table-cell-text > span,
+app-manual-evaluation-screens-evaluated table table-cell-link > div,
 app-manual-eval-findings-table table table-cell-link > div {
     display: flex;
 }
@@ -161,8 +165,10 @@ app-issue-table-column-selector .my-auto {
     border: none !important;
 }
 select.review-mode-screen-select {
+    display: block;
     height: auto;
     padding: .5rem .75rem;
+    width: 100%;
 }
 dialog.review-mode-lightbox,
 dialog.review-mode-dialog {
@@ -263,34 +269,90 @@ dialog.review-mode-lightbox .thumbnails img {
     height: 50px;
     width: 50px;
 }
+.review-mode-search.ds-search-widget {
+    max-height: 300px;
+    margin: 15px 0 -15px 0;
+    overflow-y: auto;
+}
+app-manual-evaluation > .row,
+app-manual-evaluation > .card > .card-header,
+app-manual-evaluation > .card > .card-body {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+app-manual-evaluation .evaluation-metadata {
+    width: auto !important;
+}
     `);
 })();
 (function() {
     'use strict';
     const $ = window.jQuery;
 
+    let count = 0;
     const originalOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function() {
-        this.addEventListener('load', function() {
+        this.addEventListener('load', function(event) {
             watchPage();
             const contentType = this.getResponseHeader('Content-Type');
+            const url = event.target.responseURL;
             let jsonResponse;
             if (contentType && contentType.indexOf('application/json') !== -1) {
                 jsonResponse = JSON.parse(this.responseText);
+                if (typeof jsonResponse.items === 'object' && jsonResponse.items.length > 0) {
+                    window.digitalProperties = jsonResponse.items;
+                    if (window.getAllPropertiesDone) {
+                        window.getAllManualAudits();
+                    }
+                }
+                if (typeof jsonResponse.manualAudits === 'object' && jsonResponse.manualAudits.length > 0) {
+                    window.manualAudits = jsonResponse.manualAudits;
+                    if (window.getAllManualAuditsDone) {
+                        window.getAllFindings();
+                    }
+                }
                 if (typeof jsonResponse.findings === 'object' && jsonResponse.findings.length > 0) {
                     if (typeof window.findings === 'undefined') {
                         window.findings = [];
                     }
-                    for (let i = 0; i <= jsonResponse.findings.length; i++) {
+                    let auditId = '';
+                    let digitalProperty = '';
+                    let workspace = '';
+                    let propertyKey = '';
+                    if (typeof window.digitalProperties !== 'undefined' && url.indexOf('/manual-evaluations/') !== -1 && url.indexOf('/workspaces/') !== -1 && url.indexOf('/digital-property/') !== -1 && url.indexOf('/manual-results') !== -1) {
+                        workspace = url.split('/workspaces/')[1].split('/digital-property/')[0];
+                        digitalProperty = url.split('/digital-property/')[1].split('/manual-evaluations/')[0];
+                        auditId = url.split('/manual-evaluations/')[1].split('/manual-results')[0];
+                        for (let i = 0; i < window.digitalProperties.length; i++) {
+                            if (window.digitalProperties[i]._id === digitalProperty) {
+                                propertyKey = window.digitalProperties[i].propertyKey;
+                            }
+                        }
+                    }
+                    for (let i = 0; i < jsonResponse.findings.length; i++) {
                         window.findings.push({
                             issueId: jsonResponse.findings[i].issueId,
                             attachments: jsonResponse.findings[i].attachment,
+                            summary: jsonResponse.findings[i].summary,
+                            task: jsonResponse.findings[i].task,
+                            workspace: workspace,
+                            digitalProperty: digitalProperty,
+                            auditId: auditId,
+                            propertyKey: propertyKey,
                         });
+                    }
+                    if (window.getNextFindingDone) {
+                        window.searchFindings();
                     }
                 }
                 if (typeof jsonResponse.scope === 'object' && typeof jsonResponse.scope.pages === 'object' && jsonResponse.scope.pages.length > 0) {
                     if (typeof window.screens === 'undefined') {
                         window.screens = jsonResponse.scope.pages;
+                    }
+                    if (url.indexOf('/manual-evaluations/') !== -1 && url.indexOf('/workspaces/') !== -1 && url.indexOf('/digital-property/') !== -1) {
+                        window.screens.workspace = url.split('/workspaces/')[1].split('/digital-property/')[0];
+                        window.screens.digitalProperty = url.split('/digital-property/')[1].split('/manual-evaluations/')[0];
+                        window.screens.auditId = url.split('/manual-evaluations/')[1];
                     }
                 }
             }
@@ -315,15 +377,185 @@ dialog.review-mode-lightbox .thumbnails img {
                     window.addScreenImg();
                 }
             }
+
+            // MANUAL AUDITS
+            if ($('app-admin-manual-audits').find('table-cell-text').length > 0) {
+                //observer.disconnect();
+                if ($('.review-mode-added-link-parent').length === 0) {
+                    window.updateManualAudits();
+                }
+            }
+
+            // SCOPE
+            if ($('app-manual-eval-pages-table').find('table-cell-text').length > 0) {
+                //observer.disconnect();
+                if ($('.review-mode-added').length === 0) {
+                    window.addScreenImg();
+                }
+            }
+            let renameBtn = $('app-manual-evaluation > .card > .card-body button:contains("Rename")');
+            if (renameBtn.length > 0 && $('.review-mode-view-scope').length === 0) {
+                renameBtn.after('<a href="/admin/manual-audit/' + window.screens.auditId + '/edit' + window.location.search + '&workspaceId=' + window.screens.workspace + '&digitalPropertyId=' + window.screens.digitalProperty + '" target="_blank" class="review-mode-view-scope review-mode-btn btn btn-link no-padding margin-right"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" fill="currentColor"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M104 112C90.7 112 80 122.7 80 136L80 184C80 197.3 90.7 208 104 208L152 208C165.3 208 176 197.3 176 184L176 136C176 122.7 165.3 112 152 112L104 112zM256 128C238.3 128 224 142.3 224 160C224 177.7 238.3 192 256 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L256 128zM256 288C238.3 288 224 302.3 224 320C224 337.7 238.3 352 256 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L256 288zM256 448C238.3 448 224 462.3 224 480C224 497.7 238.3 512 256 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L256 448zM80 296L80 344C80 357.3 90.7 368 104 368L152 368C165.3 368 176 357.3 176 344L176 296C176 282.7 165.3 272 152 272L104 272C90.7 272 80 282.7 80 296zM104 432C90.7 432 80 442.7 80 456L80 504C80 517.3 90.7 528 104 528L152 528C165.3 528 176 517.3 176 504L176 456C176 442.7 165.3 432 152 432L104 432z"/></svg> View Scope</button>');
+            }
+
         };
         const observer = new MutationObserver(callback);
-        const targetNode = document.querySelectorAll('app-manual-eval-findings-table, app-manual-evaluation-report')[0];
+        const targetNode = document.querySelectorAll('app-manual-eval-findings-table, app-manual-evaluation-report, app-admin-manual-audits, app-manual-eval-pages-table, app-evaluation-conformance')[0];
         const config = {
             attributes: false,
             childList: true,
             subtree: true
         };
-        observer.observe(targetNode, config);
+        if (targetNode instanceof Node) {
+            observer.observe(targetNode, config);
+        }
+    }
+    window.updateManualAudits = function() {
+        for (let i = 0; i < window.manualAudits.length; i++) {
+            let thisAudit = $('app-admin-manual-audits table span:contains(' + window.manualAudits[i].title + ')');
+            if (thisAudit.find('.review-mode-added').length === 0) {
+                thisAudit.closest('table-cell-text').addClass('review-mode-added-link-parent');
+                thisAudit.html('<a href="/manual-evaluations/' + window.manualAudits[i]._id + '/conformance" class="review-mode-added-link">' + thisAudit.text().trim() + '</a><a href="/manual-evaluations/' + window.manualAudits[i]._id + '/conformance" target="_blank" class="review-mode-link-added review-mode-new-tab-link"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 640 640" role="img" aria-label="Open ' + thisAudit.text().trim() + ' in a new tab"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M354.4 83.8C359.4 71.8 371.1 64 384 64L544 64C561.7 64 576 78.3 576 96L576 256C576 268.9 568.2 280.6 556.2 285.6C544.2 290.6 530.5 287.8 521.3 278.7L464 221.3L310.6 374.6C298.1 387.1 277.8 387.1 265.3 374.6C252.8 362.1 252.8 341.8 265.3 329.3L418.7 176L361.4 118.6C352.2 109.4 349.5 95.7 354.5 83.7zM64 240C64 195.8 99.8 160 144 160L224 160C241.7 160 256 174.3 256 192C256 209.7 241.7 224 224 224L144 224C135.2 224 128 231.2 128 240L128 496C128 504.8 135.2 512 144 512L400 512C408.8 512 416 504.8 416 496L416 416C416 398.3 430.3 384 448 384C465.7 384 480 398.3 480 416L480 496C480 540.2 444.2 576 400 576L144 576C99.8 576 64 540.2 64 496L64 240z"/></svg></a>');
+            }
+        }
+        if ($('.review-mode-search').length === 0) {
+            $('h1').closest('.card-header').after('<div class="review-mode-search ds-search-widget"><label for="review-mode-search-issueid" class="ds-search-bar-label ds-search-widget label">Search by Issue or Task ID</label><div class="ds-search-bar"><ds-icon class="ds-search-bar-icon"><!----><fa-icon class="ng-fa-icon ds-icon fa-1x"><svg role="img" aria-hidden="true" focusable="false" data-prefix="fal" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M384 208A176 176 0 1 0 32 208a176 176 0 1 0 352 0zM343.3 366C307 397.2 259.7 416 208 416C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208c0 51.7-18.8 99-50 135.3L507.3 484.7c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0L343.3 366z"></path></svg></fa-icon><!----><!----></ds-icon><input type="search" id="review-mode-search-issueid"><button id="review-mode-search">Search</button></div><div aria-live="polite" aria-atomic="true"></div></div>');
+        }
+    }
+    $(document).on('click', '[id="review-mode-search"]', function() {
+        let searchText = $('[id="review-mode-search-issueid"]')[0].value;
+        let issueId = searchText;
+        let propertyKey = '';
+        if (searchText.trim() !== '') {
+            if (searchText.indexOf('–') !== -1) {
+                issueId = searchText.split('–')[1];
+                propertyKey = searchText.split('–')[0];
+            }
+            if (searchText.indexOf('-') !== -1) {
+                issueId = searchText.split('-')[1];
+                propertyKey = searchText.split('-')[0];
+            }
+            $('.review-mode-search').find('.results-list').remove();
+            $('.review-mode-search [aria-live]').html('Searching...');
+            window.searchPropertyKey = propertyKey;
+            window.searchTerm = issueId;
+            window.getAllProperties();
+        }
+    });
+    window.getAllProperties = function() {
+        if (typeof window.getAllPropertiesDone === 'undefined') {
+            window.getAllPropertiesDone = true;
+            let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/v1/user/digital-properties', true);
+            xhr.responseType = 'text';
+            if (typeof token !== 'undefined') {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            }
+            xhr.onerror = function() {};
+            xhr.send();
+        }
+        else {
+            window.searchFindings();
+        }
+    }
+    window.getAllManualAudits = function() {
+        if (typeof window.getAllManualAuditsDone === 'undefined') {
+            window.getAllManualAuditsDone = true;
+            let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/v1/admin/manual-audit?limit=200', true);
+            xhr.responseType = 'text';
+            if (typeof token !== 'undefined') {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            }
+            xhr.onerror = function() {};
+            xhr.send();
+        }
+    }
+    window.getAllFindings = function() {
+        if (typeof window.manualAudits !== 'undefined' && typeof window.getAllFindingsDone === 'undefined') {
+            window.getAllFindingsDone = true;
+            for (let i = 0; i < window.manualAudits.length; i++) {
+                window.getNextFinding(i);
+            }
+        }
+    }
+    window.getNextFinding = function(i) {
+        let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
+        const xhr = new XMLHttpRequest();
+        let thisAudit = window.manualAudits[i];
+        let thisAuditId = thisAudit._id;
+        if (i === (window.manualAudits.length - 1)) {
+            window.getNextFindingDone = true;
+        }
+        if (typeof thisAuditId !== 'undefined' && (typeof thisAudit.workspace !== 'undefined' && typeof thisAudit.workspace._id !== 'undefined') && (typeof thisAudit.digitalProperty !== 'undefined' && typeof thisAudit.digitalProperty._id !== 'undefined')) {
+            xhr.open('GET', '/api/v1/workspaces/' + thisAudit.workspace._id + '/digital-property/' + thisAudit.digitalProperty._id + '/manual-evaluations/' + thisAuditId + '/manual-results', true);
+            xhr.responseType = 'text';
+            if (typeof token !== 'undefined') {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            }
+            xhr.onerror = function() {};
+            xhr.send();
+        }
+    }
+    window.searchFindings = function() {
+        if (typeof window.findings !== 'undefined') {
+            let searchTerm;
+            let searchMatch;
+            for (let i = 0; i < window.findings.length; i++) {
+                if (typeof window.findings[i].issueId !== 'undefined' && typeof window.findings[i].summary !== 'undefined') {
+                    let issueId = window.findings[i].issueId;
+                    searchTerm = window.searchTerm;
+                    if (window.searchPropertyKey !== '') {
+                        issueId = window.findings[i].propertyKey + '-' + window.findings[i].issueId;
+                        searchTerm = window.searchPropertyKey + '-' + window.searchTerm;
+                        searchMatch = (issueId === searchTerm);
+                    }
+                    else {
+                        searchMatch = (issueId.indexOf(searchTerm) > -1);
+                    }
+                    if (searchMatch) {
+                        let auditId = window.findings[i].auditId;
+                        let digitalProperty = window.findings[i].digitalProperty;
+                        let workspace = window.findings[i].workspace;
+                        let href = '/manual-evaluations/' + auditId + '/results/' + window.findings[i].issueId + '/view?linkedPropertyData=' + digitalProperty + '%7C' + workspace;
+                        if ($('.review-mode-search .results-list').length === 0) {
+                            $('.review-mode-search').append('<ul class="results-list"></ul>');
+                        }
+                        if ($('.review-mode-search .results-list a[href="' + href + '"]').length === 0) {
+                            $('.review-mode-search .results-list').append('<li><a href="' + href + '" target="_blank">' + window.findings[i].propertyKey + '-' + window.findings[i].issueId + ' – ' + window.findings[i].summary + '</a> [Finding]</li>');
+                        }
+                    }
+                }
+                let taskId = '';
+                try {
+                    taskId = window.findings[i].task.taskProjectId;
+                } catch(err) {}
+                if (window.searchPropertyKey !== '') {
+                    searchTerm = window.searchPropertyKey + '-' + window.searchTerm;
+                    searchMatch = (taskId === searchTerm);
+                }
+                else {
+                    searchMatch = (taskId.indexOf(searchTerm) > -1);
+                }
+                if (taskId !== '' && typeof window.findings[i].summary !== 'undefined') {
+                    if (searchMatch) {
+                        let digitalProperty = window.findings[i].digitalProperty;
+                        let workspace = window.findings[i].workspace;
+                        let href = '/projects/' + window.findings[i].task.projectId + '/tasks/' + window.findings[i].task._id + '?linkedPropertyData=' + digitalProperty + '%7C' + workspace;
+                        if ($('.review-mode-search .results-list').length === 0) {
+                            $('.review-mode-search').append('<ul class="results-list"></ul>');
+                        }
+                        if ($('.review-mode-search .results-list a[href="' + href + '"]').length === 0) {
+                            $('.review-mode-search .results-list').append('<li><a href="' + href + '" target="_blank">' + taskId + ' – ' + window.findings[i].summary + '</a> [Task]</li>');
+                        }
+                    }
+                }
+            }
+            let numResults = $('.review-mode-search .results-list li').length;
+            $('.review-mode-search [aria-live]').html(numResults + ' results found');
+        }
     }
     window.addScreenImg = function() {
         $('app-manual-evaluation-screens-evaluated a[routerlink]').each(function() {
@@ -333,12 +565,12 @@ dialog.review-mode-lightbox .thumbnails img {
         });
         for (let i = 0; i < window.screens.length; i++) {
             if (typeof window.screens[i].page !== 'undefined' && typeof window.screens[i].page.name !== 'undefined') {
-                let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name + ')').first();
+                let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name + '), app-manual-eval-pages-table table-cell-text:contains(' + window.screens[i].page.name + ')').first();
                 if (pageLink.length > 0 && $(pageLink).parent().find('.review-mode-added').length === 0) {
                     $(pageLink).addClass('review-mode-added');
                     if (typeof window.screens[i].page.screenshot.src !== 'undefined') {
                         if ($(pageLink).closest('table').find('thead th:contains("Screenshot")').length === 0) {
-                            $(pageLink).closest('table').find('thead th:contains("Screen name")').after('<th scope="col" class="review-mode-th-added">Screenshot</th>');
+                            $(pageLink).closest('table').find('thead th:first-child').after('<th scope="col" class="review-mode-th-added">Screenshot</th>');
                         }
                         $(pageLink).closest('table').find('tbody tr').filter(function() {
                             return ($(this).find('.review-mode-added-image').length === 0);
@@ -347,16 +579,19 @@ dialog.review-mode-lightbox .thumbnails img {
                     }
                     if (typeof window.screens[i].page.url !== 'undefined') {
                         if ($(pageLink).closest('table').find('thead th:contains("URL")').length === 0) {
-                            $(pageLink).closest('table').find('thead th:contains("Screen name")').after('<th scope="col" class="review-mode-th-added">URL</th>');
+                            $(pageLink).closest('table').find('thead th:first-child').after('<th scope="col" class="review-mode-th-added">URL</th>');
+                            $(pageLink).closest('table').find('tbody tr').filter(function() {
+                                return ($(this).find('.review-mode-added-url').length === 0);
+                            }).find('td:first-child').after('<td><div class="review-mode-added-url"></div></td>');
                         }
-                        $(pageLink).closest('table').find('tbody tr').filter(function() {
-                            return ($(this).find('.review-mode-added-url').length === 0);
-                        }).find('td:first-child').after('<td><div class="review-mode-added-url"></div></td>');
+                        else {
+                            $(pageLink).closest('table').find('table-cell-text:contains("http")').addClass('review-mode-added-url');
+                        }
                         $(pageLink).closest('tr').find('.review-mode-added-url').html('<a href="' + window.screens[i].page.url + '" target="_blank">' + window.screens[i].page.url + '</a>');
                     }
                     if (typeof window.screens[i].page.description !== 'undefined' && window.screens[i].page.description.trim() !== '') {
                         if ($(pageLink).closest('table').find('thead th:contains("Description")').length === 0) {
-                            $(pageLink).closest('table').find('thead th:contains("Screen name")').after('<th scope="col" class="review-mode-th-added">Description</th>');
+                            $(pageLink).closest('table').find('thead th:first-child').after('<th scope="col" class="review-mode-th-added">Description</th>');
                         }
                         $(pageLink).closest('table').find('tbody tr').filter(function() {
                             return ($(this).find('.review-mode-added-description').length === 0);
@@ -425,6 +660,7 @@ dialog.review-mode-lightbox .thumbnails img {
         if ($('[id="export-findings-button"]').next('[id="review-mode-toggle-table"]').length === 0) {
             $('[id="export-findings-button"]').insertBefore($('[id="review-mode-toggle-table"]'));
         }
+        $('[id="export-findings-button"]').parent().addClass('review-mode-btns');
         $('app-issue-table-column-selector input[type="checkbox"][disabled]').removeAttr('disabled');
         for (let i = 0; i <= window.findings.length; i++) {
             if (typeof window.findings[i] !== 'undefined') {
@@ -444,7 +680,7 @@ dialog.review-mode-lightbox .thumbnails img {
         if (typeof window.screens !== 'undefined') {
             if (filterByScreen.length > 0) {
                 if (filterByScreen.parent().find('.review-mode-screen-select').length === 0) {
-                    filterByScreenLabel.after('<select class="review-mode-screen-select" aria-label="Screen"><option></option></select>');
+                    filterByScreenLabel.after('<select class="w-100 form-select ng-pristine ng-valid ng-touched review-mode-screen-select" aria-label="Screen"><option value="">-- Select an option --</option></select>');
                 }
                 for (let i = 0; i < window.screens.length; i++) {
                     if (typeof window.screens[i].page !== 'undefined' && $('.review-mode-screen-select').find('option:contains(' + window.screens[i].page.name + ')').length === 0) {
@@ -474,7 +710,7 @@ dialog.review-mode-lightbox .thumbnails img {
             $(this).find('img').unwrap();
         });
         $(element).find('table-cell-text').each(function() {
-            $(this).find('span').html($(this).find('span').text().replace(/(\r\n|\n|\r)/g, '<br style="mso-data-placement:same-cell;">'));
+            $(this).find('span').html($(this).find('span').text().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/(\r\n|\n|\r)/g, '<br style="mso-data-placement:same-cell;">'));
         });
         const htmlBlob = new Blob([element[0].outerHTML], { type: "text/html" });
         try {
