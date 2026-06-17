@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.7
+// @version      1.1.8
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
 // @match        *.levelaccess.io/*
 // @match        *.essentialaccessibility.com/*
+// @updateURL    https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
+// @downloadURL  https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
 // @grant        GM_addStyle
 // @require      https://code.jquery.com/jquery-4.0.0.min.js
 // ==/UserScript==
@@ -707,6 +709,10 @@ app-manual-evaluation .evaluation-metadata {
                 }
             }
         }
+        if (typeof window.returnFocusToEdit !== 'undefined') {
+            $('app-manual-eval-findings-table a[routerlink]:contains(' + window.returnFocusToEdit + ')').closest('td').find('a.review-mode-edit-link').focus();
+            window.returnFocusToEdit = undefined;
+        }
     }
     window.copyTable = async function() {
         let element = $('app-manual-eval-findings-table table').clone();
@@ -781,8 +787,10 @@ app-manual-evaluation .evaluation-metadata {
         });
     }
     window.reviewModeCloseDialog = function() {
-        $('dialog.review-mode-dialog')[0].close();
-        $('dialog.review-mode-dialog').remove();
+        let dialog = $('dialog.review-mode-dialog');
+        window.returnFocusToEdit = dialog.attr('aria-label').split('Edit ')[1];
+        dialog[0].close();
+        dialog.remove();
         $('app-accordion-filter button:contains("Apply filters")').click();
     }
     $(document).on('click', '[id="review-mode-enhance-table"]', function() {
