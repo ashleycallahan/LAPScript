@@ -49,7 +49,7 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 
 ## Versioning
 
-- Current script header version: `1.1.7`
+- Current script header version: `1.1.8`
 
 ## Authors
 
