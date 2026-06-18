@@ -6,6 +6,12 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 
 - `https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js`
 
+## Versioning
+
+- Current script header version: `1.1.9`
+
+If you are not seeing any of the features listed below, it is recommended that you [update](#installation).
+
 ## What It Adds
 
 - Screenshots, descriptions, and clickable URLs in report tables.
@@ -52,10 +58,6 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 4. Paste in `https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js`.
 5. Save and enable the script.
 6. Open a supported Level Access platform page.
-
-## Versioning
-
-- Current script header version: `1.1.8`
 
 ## Authors
 
