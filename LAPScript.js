@@ -124,6 +124,11 @@ app-manual-evaluation-screens-evaluated table table-cell-link > div,
 app-manual-eval-findings-table table table-cell-link > div {
     display: flex;
 }
+app-admin-manual-audits table table-cell-text > span a:not(.review-mode-link-added),
+app-manual-evaluation-screens-evaluated table table-cell-link > div a:not(.review-mode-link-added),
+app-manual-eval-findings-table table table-cell-link > div a:not(.review-mode-link-added) {
+    flex: 1 1 auto;
+}
 app-manual-eval-findings-table table a[routerlink] {
     white-space: nowrap;
 }
