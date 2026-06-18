@@ -9,7 +9,7 @@
 // @match        *.essentialaccessibility.com/*
 // @updateURL    https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
 // @downloadURL  https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
-// @icon         https://bcbsa.hub.essentia11y.com/static/assets/images/favicon.ico
+// @icon         https://dashboard.essentialaccessibility.com/static/assets/images/favicon.ico
 // @grant        GM_addStyle
 // @require      https://code.jquery.com/jquery-4.0.0.min.js
 // ==/UserScript==
