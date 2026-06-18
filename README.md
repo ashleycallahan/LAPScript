@@ -8,21 +8,25 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 
 ## What It Adds
 
-- Table enhancements for findings and screens views.
-- Inline screenshot/attachment previews in report tables.
-!["View description, URL, and screenshot on the screens tab"](lapscript-screens.png)
-- Quick links for opening items in new tabs.
+- Screenshots, descriptions, and clickable URLs in report tables.
+!["View description, URL, and screenshot in the report tables"](lapscript-screens.png)
+- Quick links for opening findings and screens in new tabs.
+!["Open internal links in new tabs"](lapscript-newtab.png)
 - Edit-in-dialog workflow for findings.
 !["Edit findings without leaving the screen"](lapscript-edit.png)
 - Lightbox viewer for finding images.
 !["inline images with lightbox"](lapscript-lightbox.webp)
-- Copy table content in rich HTML format for spreadsheet workflows.
+- Expand the findings table full-screen.
+!["Expand the findings table"](lapscript-expand.png)
+- Copy customized table content in rich HTML format for spreadsheet workflows.
 !["Copy and paste table content into Excel"](lapscript-copy.png)
-- Extra controls such as Refresh, Copy Table, Highlight Rows, and Expand/Collapse Table.
+- Quick-access Refresh button to update table data without a full page refresh.
+!["Refresh the table data"](lapscript-refresh.png)
+- Highlight the table rows for better visibility.
 !["Highlighting of rows"](lapscript-highlight-rows.png)
-- View more than 6 columns of data for Findings.
+- View more than 6 columns of data for findings.
 !["Choose as many columns as you like"](lapscript-columns.png)
-- Switch between screens from the Findings screen.
+- Switch between screens from within the findings screen.
 !["Select screen"](lapscript-screen-switcher.png)
 - Search manual evaluations by Issue or Task ID.
 !["Search by Issue or Task ID"](lapscript-search.png)
