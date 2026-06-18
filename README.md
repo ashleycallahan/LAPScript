@@ -28,6 +28,8 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 !["Choose as many columns as you like"](lapscript-columns.png)
 - Switch between screens from within the findings screen.
 !["Select screen"](lapscript-screen-switcher.png)
+- Quick-access View Scope link to see all pages in an evaluation.
+!["Easily view the evaluation scope"](lapscript-scope.png)
 - Search manual evaluations by Issue or Task ID.
 !["Search by Issue or Task ID"](lapscript-search.png)
 
