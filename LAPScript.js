@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.9
+// @version      1.1.10
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -595,6 +595,8 @@ app-manual-evaluation .evaluation-metadata {
                     if (typeof window.screens[i].page.url !== 'undefined') {
                         if ($(pageLink).closest('table').find('thead th:contains("URL")').length === 0) {
                             $(pageLink).closest('table').find('thead th:first-child').after('<th scope="col" class="review-mode-th-added">URL</th>');
+                        }
+                        if ($('app-manual-evaluation-screens-evaluated').length > 0) {
                             $(pageLink).closest('table').find('tbody tr').filter(function() {
                                 return ($(this).find('.review-mode-added-url').length === 0);
                             }).find('td:first-child').after('<td><div class="review-mode-added-url"></div></td>');
