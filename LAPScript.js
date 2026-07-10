@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.10
+// @version      1.1.11
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -96,6 +96,9 @@ app-manual-eval-findings-table table td {
 .review-mode-added-url {
     color: #000;
     width: 250px;
+}
+.review-mode-added-description {
+    white-space: pre-wrap;
 }
 .review-mode-replaced {
     border: 2px solid;
@@ -288,6 +291,11 @@ app-manual-evaluation > .card > .card-body {
     padding-top: 0 !important;
 }
 app-manual-evaluation .evaluation-metadata {
+    width: auto !important;
+}
+app-manual-eval-pages-table th,
+app-manual-eval-pages-table td {
+    max-width: 250px;
     width: auto !important;
 }
     `);
@@ -580,7 +588,8 @@ app-manual-evaluation .evaluation-metadata {
         });
         for (let i = 0; i < window.screens.length; i++) {
             if (typeof window.screens[i].page !== 'undefined' && typeof window.screens[i].page.name !== 'undefined') {
-                let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name + '), app-manual-eval-pages-table table-cell-text:contains(' + window.screens[i].page.name + ')').first();
+                console.log(window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+                let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '), app-manual-eval-pages-table table-cell-text:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')').first();
                 if (pageLink.length > 0 && $(pageLink).parent().find('.review-mode-added').length === 0) {
                     $(pageLink).addClass('review-mode-added');
                     if (typeof window.screens[i].page.screenshot.src !== 'undefined') {
