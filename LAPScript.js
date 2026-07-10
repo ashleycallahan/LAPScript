@@ -588,7 +588,6 @@ app-manual-eval-pages-table td {
         });
         for (let i = 0; i < window.screens.length; i++) {
             if (typeof window.screens[i].page !== 'undefined' && typeof window.screens[i].page.name !== 'undefined') {
-                console.log(window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
                 let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '), app-manual-eval-pages-table table-cell-text:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')').first();
                 if (pageLink.length > 0 && $(pageLink).parent().find('.review-mode-added').length === 0) {
                     $(pageLink).addClass('review-mode-added');
