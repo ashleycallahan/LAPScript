@@ -8,7 +8,7 @@ LAPScript is a Tampermonkey userscript that enhances the Level Access Platform m
 
 ## Versioning
 
-- Current script header version: `1.1.11`
+- Current script header version: `1.1.12`
 
 If you are not seeing any of the features listed below, it is recommended that you [update](#installation).
 
