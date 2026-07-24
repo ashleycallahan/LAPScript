@@ -14,7 +14,7 @@ If you are not seeing any of the features listed below, it is recommended that y
 
 ## WARNING!
 
-LAPScript is a custom JavaScript file that is intended to improve and enhance the delivered Level Access Platform UI. This script is NOT supported by IT or Product. By installing it you acknowledge that unintended interactions may occur between the script and Platform and that you will [turn this script off](#disabling-the-script) before reporting any issues to IT or Product. Bugs or feature requests that are related to the script can be logged at this GitHub location.
+LAPScript is a custom JavaScript file that is intended to improve and enhance the delivered Level Access Platform UI. This script is NOT supported by IT or Product. By installing it you acknowledge that unintended interactions may occur between the script and Platform and that you will [turn this script off](#disabling-the-script) before reporting any issues to IT or Product. Bugs or feature requests that are related to the script can be logged via the [Issues tab](https://github.com/ashleycallahan/LAPScript/issues) in GitHub.
 
 ## What It Adds
 
