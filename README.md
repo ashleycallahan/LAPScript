@@ -14,7 +14,7 @@ If you are not seeing any of the features listed below, it is recommended that y
 
 ## WARNING!
 
-LAPScript is a custom JavaScript file that is intended to improve and enhance the delivered Level Access Platform UI. This script is NOT supported by IT or Product. By installing it you acknowledge that unintended interactions may occur between the script and Platform and that you will turn this script off before reporting any issues to IT or Product. Bugs or feature requests that are related to the script can be logged at this GitHub location.
+LAPScript is a custom JavaScript file that is intended to improve and enhance the delivered Level Access Platform UI. This script is NOT supported by IT or Product. By installing it you acknowledge that unintended interactions may occur between the script and Platform and that you will [turn this script off](#disabling-the-script) before reporting any issues to IT or Product. Bugs or feature requests that are related to the script can be logged at this GitHub location.
 
 ## What It Adds
 
@@ -55,13 +55,19 @@ LAPScript is a custom JavaScript file that is intended to improve and enhance th
 ## Installation
 
 1. Open Tampermonkey and go to Dashboard.
-!["Locate the tampermonkey icon in your bookmarks bar, then navigate down to Dashboard"](docs/images/tamperMonkey-step1.png)
+!["Locate the Tampermonkey icon in your bookmarks bar, then navigate down to Dashboard"](docs/images/tamperMonkey-step1.png)
 2. Open the Utilities tab.
 3. Locate "Import from URL"
 !["Navigate to Import from URL"](docs/images/tampermonkey-step2.png)
 4. Paste in `https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js`.
 5. Save and enable the script.
-6. Open a supported Level Access platform page.
+6. Open a supported Level Access Platform page.
+
+## Disabling The Script
+1. Open a supported Level Access Platform page.
+2. Open Tampermonkey from your list of active extensions.
+3. Toggle the active script ("Level Access Platform Script") to off.
+!["How to toggle LAPScript off"](docs/images/tamperMonkey-off.png)
 
 ## Authors
 
