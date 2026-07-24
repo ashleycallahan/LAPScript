@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.12
+// @version      1.1.13
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -95,6 +95,7 @@ app-manual-eval-findings-table table td {
 .review-mode-added-description,
 .review-mode-added-url {
     color: #000;
+    display: block;
     width: 250px;
 }
 .review-mode-added-description {
@@ -369,6 +370,9 @@ app-manual-eval-pages-table td {
                         window.screens.digitalProperty = url.split('/digital-property/')[1].split('/manual-evaluations/')[0];
                         window.screens.auditId = url.split('/manual-evaluations/')[1];
                     }
+                    if ($('app-manual-eval-pages-table').find('table-cell-text').length > 0) {
+                        window.addScreenImg();
+                    }
                 }
             }
         });
@@ -380,8 +384,15 @@ app-manual-eval-pages-table td {
             // FINDINGS
             if ($('app-manual-eval-findings-table').find('table a[routerlink]').length > 0) {
                 //observer.disconnect();
-                if ($('.review-mode-replaced').length === 0 || ($('.review-mode-replaced').length < $('app-manual-eval-findings-table').find('table a[routerlink]').length)) {
+                let newRows = $('app-manual-eval-findings-table').find('table > tbody > tr:not(.review-mode-updated)').filter(function() {
+                   return ($(this).find('.review-mode-replaced').length === 0)
+                });
+                if ($('.review-mode-replaced').length === 0) {
                     window.replaceAttachments();
+                }
+                else if (newRows.length > 0) {
+                    window.replaceAttachments();
+                    newRows.addClass('review-mode-updated');
                 }
             }
 
