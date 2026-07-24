@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.13
+// @version      1.1.14
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -283,6 +283,8 @@ dialog.review-mode-lightbox .thumbnails img {
 }
 .review-mode-search.ds-search-widget {
     max-height: 300px;
+}
+.review-mode-search.ds-search-widget .results-list {
     overflow-y: auto;
 }
 app-manual-evaluation > .row,
@@ -450,9 +452,15 @@ app-manual-eval-pages-table td {
             }
         }
         if ($('.review-mode-search').length === 0) {
-            $('.ds-search-widget label:contains(Search by name)').parent().before('<div class="review-mode-search ds-search-widget"><label for="review-mode-search-issueid" class="ds-search-bar-label ds-search-widget label">Search by Issue or Task ID</label><div class="ds-search-bar"><ds-icon class="ds-search-bar-icon"><!----><fa-icon class="ng-fa-icon ds-icon fa-1x"><svg role="img" aria-hidden="true" focusable="false" data-prefix="fal" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M384 208A176 176 0 1 0 32 208a176 176 0 1 0 352 0zM343.3 366C307 397.2 259.7 416 208 416C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208c0 51.7-18.8 99-50 135.3L507.3 484.7c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0L343.3 366z"></path></svg></fa-icon><!----><!----></ds-icon><input type="search" id="review-mode-search-issueid"><button id="review-mode-search">Search</button></div><div aria-live="polite" aria-atomic="true"></div></div>');
+            $('.ds-search-widget label:contains(Search by name)').parent().before('<div class="review-mode-search ds-search-widget"><label for="review-mode-search-issueid" class="ds-search-bar-label ds-search-widget label">Search by Issue or Task ID</label><div class="ds-search-bar"><div class="ds-search-bar-field"><input type="search" autocomplete="on" class="ds-override-focus-indicator" id="review-mode-search-issueid" placeholder="Search..."></div><button type="button" class="ds-override-focus-indicator ds-btn-secondary ds-btn ds-btn-icon-only" aria-label="Search" id="review-mode-search"><ds-icon class="ds-btn-icon" data-test-id="button-icon"><fa-icon class="ng-fa-icon ds-icon fa-1x"><svg role="img" aria-hidden="true" focusable="false" data-prefix="fal" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M384 208A176 176 0 1 0 32 208a176 176 0 1 0 352 0zM343.3 366C307 397.2 259.7 416 208 416C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208c0 51.7-18.8 99-50 135.3L507.3 484.7c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0L343.3 366z"></path></svg></fa-icon></ds-icon></button></div><div aria-live="polite" aria-atomic="true"></div></div>');
         }
     }
+    $(document).on('keydown', function(event) {
+        if ($('app-admin-manual-audits').length > 0 && event.key === 'Enter' && $(event.target).is('[id="review-mode-search-issueid"]')) {
+            event.preventDefault();
+            $('[id="review-mode-search"]')[0].click();
+        }
+    });
     $(document).on('click', '[id="review-mode-search"]', function() {
         let searchText = $('[id="review-mode-search-issueid"]')[0].value;
         let issueId = searchText;
