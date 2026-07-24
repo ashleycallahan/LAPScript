@@ -370,9 +370,6 @@ app-manual-eval-pages-table td {
                         window.screens.digitalProperty = url.split('/digital-property/')[1].split('/manual-evaluations/')[0];
                         window.screens.auditId = url.split('/manual-evaluations/')[1];
                     }
-                    if ($('app-manual-eval-pages-table').find('table-cell-text').length > 0) {
-                        window.addScreenImg();
-                    }
                 }
             }
         });
