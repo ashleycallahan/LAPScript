@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.14
+// @version      1.1.15
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -742,7 +742,7 @@ app-manual-eval-pages-table td {
             }
         }
         if (typeof window.returnFocusToEdit !== 'undefined') {
-            $('app-manual-eval-findings-table a[routerlink]:contains(' + window.returnFocusToEdit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')').closest('td').find('a.review-mode-edit-link').focus();
+            $('app-manual-eval-findings-table a[routerlink]:contains("' + window.returnFocusToEdit + '")').first().closest('td').find('a.review-mode-edit-link').focus();
             window.returnFocusToEdit = undefined;
         }
     }
@@ -865,7 +865,26 @@ app-manual-eval-pages-table td {
     });
     $(document).on('click', '.review-mode-edit-link', function(event) {
         event.preventDefault();
-        window.reviewModeOpenDialog($(this).attr('data-href'));
+        let rowActions = $(this).closest('tr').find('table-cell-dropdown');
+        if (rowActions.length > 0) {
+            rowActions.find('button.dropdown-toggle').click();
+            rowActions.find('button.dropdown-item:contains("Edit")').click();
+        } else {
+            window.reviewModeOpenDialog($(this).attr('data-href'));
+        }
+    });
+    $(document).on('click', 'ds-modal .modal-close-button, ds-modal .modal-footer button:contains("Cancel")', function() {
+        if ($('.review-mode-edit-link').length > 0) {
+            const escapeEvent = new KeyboardEvent('keydown', {
+                key: 'Escape',
+                code: 'Escape',
+                keyCode: 27,
+                which: 27,
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(escapeEvent);
+        }
     });
     $(document).on('click', '.review-mode-dialog-close', function() {
         window.reviewModeCloseDialog();
