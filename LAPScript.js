@@ -873,7 +873,7 @@ app-manual-eval-pages-table td {
             window.reviewModeOpenDialog($(this).attr('data-href'));
         }
     });
-    $(document).on('click', 'ds-modal .modal-close-button, ds-modal .modal-footer button:contains("Cancel")', function() {
+    $(document).on('click', 'ds-modal .modal-close-button, ds-modal .modal-footer button', function() {
         if ($('.review-mode-edit-link').length > 0) {
             const escapeEvent = new KeyboardEvent('keydown', {
                 key: 'Escape',
@@ -884,6 +884,9 @@ app-manual-eval-pages-table td {
                 cancelable: true
             });
             document.dispatchEvent(escapeEvent);
+            setTimeout(function() {
+                document.dispatchEvent(escapeEvent);
+            }, 1000);
         }
     });
     $(document).on('click', '.review-mode-dialog-close', function() {
