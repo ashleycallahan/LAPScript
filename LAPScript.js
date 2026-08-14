@@ -607,7 +607,7 @@ app-manual-eval-pages-table td {
                 let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '), app-manual-eval-pages-table table-cell-text:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')').first();
                 if (pageLink.length > 0 && $(pageLink).parent().find('.review-mode-added').length === 0) {
                     $(pageLink).addClass('review-mode-added');
-                    if (typeof window.screens[i].page.screenshot.src !== 'undefined') {
+                    if (typeof window.screens[i].page.screenshot !== 'undefined' && typeof window.screens[i].page.screenshot.src !== 'undefined') {
                         if ($(pageLink).closest('table').find('thead th:contains("Screenshot")').length === 0) {
                             $(pageLink).closest('table').find('thead th:first-child').after('<th scope="col" class="review-mode-th-added">Screenshot</th>');
                         }
