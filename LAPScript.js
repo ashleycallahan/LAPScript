@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.15
+// @version      1.1.16
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -359,6 +359,9 @@ app-manual-eval-pages-table td {
                             propertyKey: propertyKey,
                         });
                     }
+                    if (typeof jsonResponse.lastId !== 'undefined') {
+                        window.getNextFinding((window.manualAudits.length - 1), jsonResponse.lastId);
+                    }
                     if (window.getNextFindingDone) {
                         window.searchFindings();
                     }
@@ -520,16 +523,20 @@ app-manual-eval-pages-table td {
             }
         }
     }
-    window.getNextFinding = function(i) {
+    window.getNextFinding = function(i, lastId) {
         let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
         const xhr = new XMLHttpRequest();
         let thisAudit = window.manualAudits[i];
         let thisAuditId = thisAudit._id;
+        let lastIdStr = '';
+        if (typeof lastId !== 'undefined') {
+            lastIdStr = '?lastId=' + lastId;
+        }
         if (i === (window.manualAudits.length - 1)) {
             window.getNextFindingDone = true;
         }
         if (typeof thisAuditId !== 'undefined' && (typeof thisAudit.workspace !== 'undefined' && typeof thisAudit.workspace._id !== 'undefined') && (typeof thisAudit.digitalProperty !== 'undefined' && typeof thisAudit.digitalProperty._id !== 'undefined')) {
-            xhr.open('GET', '/api/v1/workspaces/' + thisAudit.workspace._id + '/digital-property/' + thisAudit.digitalProperty._id + '/manual-evaluations/' + thisAuditId + '/manual-results', true);
+            xhr.open('GET', '/api/v1/workspaces/' + thisAudit.workspace._id + '/digital-property/' + thisAudit.digitalProperty._id + '/manual-evaluations/' + thisAuditId + '/manual-results' + lastIdStr, true);
             xhr.responseType = 'text';
             if (typeof token !== 'undefined') {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + token);
