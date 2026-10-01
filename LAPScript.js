@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.17
+// @version      1.1.18
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -296,11 +296,37 @@ dialog.review-mode-lightbox .thumbnails img {
     height: 50px;
     width: 50px;
 }
+app-manual-audits .card-body .me-auto {
+    width: 100%;
+}
+details.review-mode-search {
+    margin: 0 0 25px 0;
+    min-width: 40vw;
+}
+details.review-mode-search summary {
+    border: 1px solid #000;
+    border-radius: 5px;
+    font-weight: bold;
+    padding: 15px;
+}
+details.review-mode-search[open] summary {
+    border-radius: 5px 5px 0 0;
+}
+details.review-mode-search .review-mode-search-content {
+    border-right: 1px solid #000;
+    border-left: 1px solid #000;
+    border-bottom: 1px solid #000;
+    border-radius: 0px 0px 5px 5px;
+    padding: 15px;
+}
 .review-mode-search.ds-search-widget {
     max-height: 300px;
 }
 .review-mode-search.ds-search-widget .results-list {
     overflow-y: auto;
+}
+a#review-mode-search-download {
+    display: inline-block;
 }
 app-manual-evaluation > .row,
 app-manual-evaluation > .card > .card-header,
@@ -347,6 +373,7 @@ app-manual-eval-pages-table td {
                 if (typeof jsonResponse.findings === 'object' && jsonResponse.findings.length > 0) {
                     if (typeof window.findings === 'undefined') {
                         window.findings = [];
+                        window.findingsAll = [];
                     }
                     let auditId = '';
                     let digitalProperty = '';
@@ -368,11 +395,13 @@ app-manual-eval-pages-table td {
                             attachments: jsonResponse.findings[i].attachment,
                             summary: jsonResponse.findings[i].summary,
                             task: jsonResponse.findings[i].task,
+                            ruleId: jsonResponse.findings[i].ruleId,
                             workspace: workspace,
                             digitalProperty: digitalProperty,
                             auditId: auditId,
                             propertyKey: propertyKey,
                         });
+                        window.findingsAll.push(jsonResponse.findings[i]);
                     }
                     if (typeof jsonResponse.lastId !== 'undefined') {
                         window.getNextFinding((window.manualAudits.length - 1), jsonResponse.lastId);
@@ -471,35 +500,84 @@ app-manual-eval-pages-table td {
             }
         }
         if ($('.review-mode-search').length === 0) {
-            $('.ds-search-widget label:contains(Search by name)').parent().before('<div class="review-mode-search ds-search-widget"><label for="review-mode-search-issueid" class="ds-search-bar-label ds-search-widget label">Search by Issue or Task ID</label><div class="ds-search-bar"><div class="ds-search-bar-field"><input type="search" autocomplete="on" class="ds-override-focus-indicator" id="review-mode-search-issueid" placeholder="Search..."></div><button type="button" class="ds-override-focus-indicator ds-btn-secondary ds-btn ds-btn-icon-only" aria-label="Search" id="review-mode-search"><ds-icon class="ds-btn-icon" data-test-id="button-icon"><fa-icon class="ng-fa-icon ds-icon fa-1x"><svg role="img" aria-hidden="true" focusable="false" data-prefix="fal" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M384 208A176 176 0 1 0 32 208a176 176 0 1 0 352 0zM343.3 366C307 397.2 259.7 416 208 416C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208c0 51.7-18.8 99-50 135.3L507.3 484.7c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0L343.3 366z"></path></svg></fa-icon></ds-icon></button></div><div aria-live="polite" aria-atomic="true"></div></div>');
+            $('.ds-search-widget label:contains(Search by name)').parent().before('<details open class="review-mode-search"><summary>Findings Search</summary><div class="review-mode-search-content"><div class="review-mode-search review-mode-search-issueid ds-search-widget"><label for="review-mode-search-issueid" class="ds-search-bar-label ds-search-widget label">Search by Issue or Task ID</label><div class="ds-search-bar"><div class="ds-search-bar-field"><input type="search" autocomplete="on" class="ds-override-focus-indicator" id="review-mode-search-issueid" placeholder="Search..."></div><button type="button" class="ds-override-focus-indicator ds-btn-secondary ds-btn ds-btn-icon-only" aria-label="Search" id="review-mode-search-issueid-btn"><ds-icon class="ds-btn-icon" data-test-id="button-icon"><fa-icon class="ng-fa-icon ds-icon fa-1x"><svg role="img" aria-hidden="true" focusable="false" data-prefix="fal" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M384 208A176 176 0 1 0 32 208a176 176 0 1 0 352 0zM343.3 366C307 397.2 259.7 416 208 416C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208c0 51.7-18.8 99-50 135.3L507.3 484.7c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0L343.3 366z"></path></svg></fa-icon></ds-icon></button></div><div aria-live="polite" aria-atomic="true"></div></div><div class="review-mode-search review-mode-search-ruleid ds-search-widget"><label for="review-mode-search-ruleid" class="ds-search-bar-label ds-search-widget label">Search by Rule ID</label><div class="ds-search-bar"><div class="ds-search-bar-field"><input type="search" autocomplete="on" class="ds-override-focus-indicator" id="review-mode-search-ruleid" placeholder="Search..."></div><button type="button" class="ds-override-focus-indicator ds-btn-secondary ds-btn ds-btn-icon-only" aria-label="Search" id="review-mode-search-ruleid-btn"><ds-icon class="ds-btn-icon" data-test-id="button-icon"><fa-icon class="ng-fa-icon ds-icon fa-1x"><svg role="img" aria-hidden="true" focusable="false" data-prefix="fal" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M384 208A176 176 0 1 0 32 208a176 176 0 1 0 352 0zM343.3 366C307 397.2 259.7 416 208 416C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208c0 51.7-18.8 99-50 135.3L507.3 484.7c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0L343.3 366z"></path></svg></fa-icon></ds-icon></button></div><div aria-live="polite" aria-atomic="true"></div></div></div></details>');
         }
     }
     $(document).on('keydown', function(event) {
-        if ($('app-admin-manual-audits').length > 0 && event.key === 'Enter' && $(event.target).is('[id="review-mode-search-issueid"]')) {
+        if ($('app-admin-manual-audits').length > 0 && event.key === 'Enter') {
             event.preventDefault();
-            $('[id="review-mode-search"]')[0].click();
+            if ($(event.target).is('[id="review-mode-search-issueid"]')) {
+                $('[id="review-mode-search-issueid-btn"]')[0].click();
+            }
+            if ($(event.target).is('[id="review-mode-search-ruleid"]')) {
+                $('[id="review-mode-search-ruleid-btn"]')[0].click();
+            }
         }
     });
-    $(document).on('click', '[id="review-mode-search"]', function() {
-        let searchText = $('[id="review-mode-search-issueid"]')[0].value;
+    $(document).on('click', '[id="review-mode-search-issueid-btn"], [id="review-mode-search-ruleid-btn"]', function(event) {
+        let searchText = '';
+        let searchType = '';
+        if ($(this).is('[id="review-mode-search-issueid-btn"]')) {
+            searchText = $('[id="review-mode-search-issueid"]')[0].value;
+            searchType = 'issueid';
+        }
+        if ($(this).is('[id="review-mode-search-ruleid-btn"]')) {
+            searchText = $('[id="review-mode-search-ruleid"]')[0].value;
+            searchType = 'ruleid';
+        }
         let issueId = searchText;
         let propertyKey = '';
         if (searchText.trim() !== '') {
-            if (searchText.indexOf('–') !== -1) {
-                issueId = searchText.split('–')[1];
-                propertyKey = searchText.split('–')[0];
+            if (searchType === 'issueId') {
+                if (searchText.indexOf('–') !== -1) {
+                    issueId = searchText.split('–')[1];
+                    propertyKey = searchText.split('–')[0];
+                }
+                if (searchText.indexOf('-') !== -1) {
+                    issueId = searchText.split('-')[1];
+                    propertyKey = searchText.split('-')[0];
+                }
+                searchText = issueId;
             }
-            if (searchText.indexOf('-') !== -1) {
-                issueId = searchText.split('-')[1];
-                propertyKey = searchText.split('-')[0];
-            }
-            $('.review-mode-search').find('.results-list').remove();
-            $('.review-mode-search [aria-live]').html('Searching...');
-            window.searchPropertyKey = propertyKey;
-            window.searchTerm = issueId;
+            $('.review-mode-search-' + searchType).find('.results-list').remove();
+            $('.review-mode-search-' + searchType + ' [aria-live]').html('Searching...');
+            window.search = {
+                propertyKey: propertyKey,
+                term: searchText,
+                type: searchType,
+            };
             window.getAllProperties();
         }
     });
+    $(document).on('click', '[id="review-mode-search-download"]', function(event) {
+        event.preventDefault();
+        const date = new Date();
+        const timestamp = date.toISOString().replace(/[:.]/g, '-').replace('T', '_').slice(0, 19);
+        saveJSONToFile(window.findingsAll, window.location.host + '-findings-' + timestamp);
+    });
+    function saveJSONToFile(jsonObject, filename) {
+        // 1. Convert the JavaScript object into a JSON string
+        const jsonString = JSON.stringify(jsonObject, null, 2);
+
+        // 2. Create a Blob with the JSON string and set the type to application/json
+        const blob = new Blob([jsonString], { type: "application/json" });
+
+        // 3. Create a temporary URL pointing to the Blob
+        const url = URL.createObjectURL(blob);
+
+        // 4. Create a temporary anchor (<a>) element
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${filename}.json`; // The name of the file to be downloaded
+
+        // 5. Programmatically click the link to trigger the download, then clean up
+        document.body.appendChild(link);
+        link.click();
+
+        // Clean up the DOM and revoke the object URL to free up memory
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
     window.getAllProperties = function() {
         if (typeof window.getAllPropertiesDone === 'undefined') {
             window.getAllPropertiesDone = true;
@@ -566,57 +644,83 @@ app-manual-eval-pages-table td {
             let searchTerm;
             let searchMatch;
             for (let i = 0; i < window.findings.length; i++) {
-                if (typeof window.findings[i].issueId !== 'undefined' && typeof window.findings[i].summary !== 'undefined') {
-                    let issueId = window.findings[i].issueId;
-                    searchTerm = window.searchTerm;
-                    if (window.searchPropertyKey !== '') {
-                        issueId = window.findings[i].propertyKey + '-' + window.findings[i].issueId;
-                        searchTerm = window.searchPropertyKey + '-' + window.searchTerm;
-                        searchMatch = (issueId === searchTerm);
+                if (window.search.type === 'issueid') {
+                    if (typeof window.findings[i].issueId !== 'undefined' && typeof window.findings[i].summary !== 'undefined') {
+                        let issueId = window.findings[i].issueId;
+                        searchTerm = window.search.term;
+                        if (window.search.propertyKey !== '') {
+                            issueId = window.findings[i].propertyKey + '-' + window.findings[i].issueId;
+                            searchTerm = window.search.propertyKey + '-' + window.search.term;
+                            searchMatch = (issueId === searchTerm);
+                        }
+                        else {
+                            searchMatch = (issueId.indexOf(searchTerm) > -1);
+                        }
+                        if (searchMatch) {
+                            let auditId = window.findings[i].auditId;
+                            let digitalProperty = window.findings[i].digitalProperty;
+                            let workspace = window.findings[i].workspace;
+                            let href = '/manual-evaluations/' + auditId + '/results/' + window.findings[i].issueId + '/view?linkedPropertyData=' + digitalProperty + '%7C' + workspace;
+                            if ($('.review-mode-search-issueid .results-list').length === 0) {
+                                $('.review-mode-search-issueid').append('<ul class="results-list"></ul>');
+                            }
+                            if ($('.review-mode-search-issueid .results-list a[href="' + href + '"]').length === 0) {
+                                $('.review-mode-search-issueid .results-list').append('<li><a href="' + href + '" target="_blank">' + window.findings[i].propertyKey + '-' + window.findings[i].issueId + ' – ' + window.findings[i].summary + '</a> [Finding]</li>');
+                            }
+                        }
+                    }
+                    let taskId = '';
+                    try {
+                        taskId = window.findings[i].task.taskProjectId;
+                    } catch(err) {}
+                    if (window.search.propertyKey !== '') {
+                        searchTerm = window.search.propertyKey + '-' + window.search.term;
+                        searchMatch = (taskId === searchTerm);
                     }
                     else {
-                        searchMatch = (issueId.indexOf(searchTerm) > -1);
+                        searchMatch = (taskId.indexOf(searchTerm) > -1);
                     }
-                    if (searchMatch) {
-                        let auditId = window.findings[i].auditId;
-                        let digitalProperty = window.findings[i].digitalProperty;
-                        let workspace = window.findings[i].workspace;
-                        let href = '/manual-evaluations/' + auditId + '/results/' + window.findings[i].issueId + '/view?linkedPropertyData=' + digitalProperty + '%7C' + workspace;
-                        if ($('.review-mode-search .results-list').length === 0) {
-                            $('.review-mode-search').append('<ul class="results-list"></ul>');
-                        }
-                        if ($('.review-mode-search .results-list a[href="' + href + '"]').length === 0) {
-                            $('.review-mode-search .results-list').append('<li><a href="' + href + '" target="_blank">' + window.findings[i].propertyKey + '-' + window.findings[i].issueId + ' – ' + window.findings[i].summary + '</a> [Finding]</li>');
+                    if (taskId !== '' && typeof window.findings[i].summary !== 'undefined') {
+                        if (searchMatch) {
+                            let digitalProperty = window.findings[i].digitalProperty;
+                            let workspace = window.findings[i].workspace;
+                            let href = '/projects/' + window.findings[i].task.projectId + '/tasks/' + window.findings[i].task._id + '?linkedPropertyData=' + digitalProperty + '%7C' + workspace;
+                            if ($('.review-mode-search-issueid .results-list').length === 0) {
+                                $('.review-mode-search-issueid').append('<ul class="results-list"></ul>');
+                            }
+                            if ($('.review-mode-search-issueid .results-list a[href="' + href + '"]').length === 0) {
+                                $('.review-mode-search-issueid .results-list').append('<li><a href="' + href + '" target="_blank">' + taskId + ' – ' + window.findings[i].summary + '</a> [Task]</li>');
+                            }
                         }
                     }
+                    let numResults = $('.review-mode-search-issueid .results-list li').length;
+                    $('.review-mode-search-issueid [aria-live]').html(numResults + ' results found');
                 }
-                let taskId = '';
-                try {
-                    taskId = window.findings[i].task.taskProjectId;
-                } catch(err) {}
-                if (window.searchPropertyKey !== '') {
-                    searchTerm = window.searchPropertyKey + '-' + window.searchTerm;
-                    searchMatch = (taskId === searchTerm);
-                }
-                else {
-                    searchMatch = (taskId.indexOf(searchTerm) > -1);
-                }
-                if (taskId !== '' && typeof window.findings[i].summary !== 'undefined') {
-                    if (searchMatch) {
-                        let digitalProperty = window.findings[i].digitalProperty;
-                        let workspace = window.findings[i].workspace;
-                        let href = '/projects/' + window.findings[i].task.projectId + '/tasks/' + window.findings[i].task._id + '?linkedPropertyData=' + digitalProperty + '%7C' + workspace;
-                        if ($('.review-mode-search .results-list').length === 0) {
-                            $('.review-mode-search').append('<ul class="results-list"></ul>');
+                if (window.search.type === 'ruleid') {
+                    if (typeof window.findings[i].ruleId !== 'undefined' && typeof window.findings[i].ruleId.ruleId !== 'undefined' && typeof window.findings[i].issueId !== 'undefined' && typeof window.findings[i].summary !== 'undefined') {
+                        let ruleId = window.findings[i].ruleId.ruleId;
+                        searchTerm = window.search.term;
+                        searchMatch = (ruleId === searchTerm.trim());
+                        if (searchMatch) {
+                            let auditId = window.findings[i].auditId;
+                            let digitalProperty = window.findings[i].digitalProperty;
+                            let workspace = window.findings[i].workspace;
+                            let href = '/manual-evaluations/' + auditId + '/results/' + window.findings[i].issueId + '/view?linkedPropertyData=' + digitalProperty + '%7C' + workspace;
+                            if ($('.review-mode-search-ruleid .results-list').length === 0) {
+                                $('.review-mode-search-ruleid').append('<ul class="results-list"></ul>');
+                            }
+                            if ($('.review-mode-search-ruleid .results-list a[href="' + href + '"]').length === 0) {
+                                $('.review-mode-search-ruleid .results-list').append('<li><a href="' + href + '" target="_blank">' + window.findings[i].propertyKey + '-' + window.findings[i].issueId + ' – ' + window.findings[i].summary + '</a></li>');
+                            }
                         }
-                        if ($('.review-mode-search .results-list a[href="' + href + '"]').length === 0) {
-                            $('.review-mode-search .results-list').append('<li><a href="' + href + '" target="_blank">' + taskId + ' – ' + window.findings[i].summary + '</a> [Task]</li>');
-                        }
+                        let numResults = $('.review-mode-search-ruleid .results-list li').length;
+                        $('.review-mode-search-ruleid [aria-live]').html(numResults + ' results found');
                     }
                 }
             }
-            let numResults = $('.review-mode-search .results-list li').length;
-            $('.review-mode-search [aria-live]').html(numResults + ' results found');
+            if ($('[id="review-mode-search-download"]').length === 0) {
+                $('.review-mode-search-content').append('<a _ngcontent-ng-c165711588="" ds-button="" id="review-mode-search-download" class="ds-btn-secondary ds-btn review-mode-link-added" href="#"><div class="d-flex align-items-center flex-grow-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="currentColor" aria-hidden="true"><!--!Font Awesome Pro v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2026 Fonticons, Inc.--><path d="M128 128C128 92.7 156.7 64 192 64L341.5 64C358.5 64 374.8 70.7 386.8 82.7L493.3 189.3C505.3 201.3 512 217.6 512 234.6L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 128zM336 122.5L336 216C336 229.3 346.7 240 360 240L453.5 240L336 122.5zM303 505C312.4 514.4 327.6 514.4 336.9 505L400.9 441C410.3 431.6 410.3 416.4 400.9 407.1C391.5 397.8 376.3 397.7 367 407.1L344 430.1L344 344C344 330.7 333.3 320 320 320C306.7 320 296 330.7 296 344L296 430.1L273 407.1C263.6 397.7 248.4 397.7 239.1 407.1C229.8 416.5 229.7 431.7 239.1 441L303.1 505z"></path></svg> Download JSON</div></a>');
+            }
         }
     }
     window.addScreenImg = function() {
