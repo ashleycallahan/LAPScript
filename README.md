@@ -22,8 +22,6 @@ LAPScript is a custom JavaScript file that is intended to improve and enhance th
 !["View description, URL, and screenshot in the report tables"](docs/images/lapscript-screens.png)
 - Quick links for opening findings and screens in new tabs.
 !["Open internal links in new tabs"](docs/images/lapscript-newtab.png)
-- Edit-in-dialog workflow for findings.
-!["Edit findings without leaving the screen"](docs/images/lapscript-edit.png)
 - Lightbox viewer for finding images.
 !["inline images with lightbox"](docs/images/lapscript-lightbox.webp)
 - Expand the findings table full-screen.
@@ -34,13 +32,13 @@ LAPScript is a custom JavaScript file that is intended to improve and enhance th
 !["Refresh the table data"](docs/images/lapscript-refresh.png)
 - Highlight the table rows for better visibility.
 !["Highlighting of rows"](docs/images/lapscript-highlight-rows.png)
-- View more than 6 columns of data for findings.
+- View more columns of data for findings.
 !["Choose as many columns as you like"](docs/images/lapscript-columns.png)
 - Switch between screens from within the findings screen.
 !["Select screen"](docs/images/lapscript-screen-switcher.png)
 - Quick-access View Scope link to see all pages in an evaluation.
 !["Easily view the evaluation scope"](docs/images/lapscript-scope.png)
-- Search manual evaluations by Issue or Task ID.
+- Search all manual evaluations within a tenant by Issue or Task ID or Rule ID. Download the findings data as JSON to use in external tools, such as Copilot. 
 !["Search by Issue or Task ID"](docs/images/lapscript-search.png)
 
 ## Requirements
@@ -64,6 +62,7 @@ LAPScript is a custom JavaScript file that is intended to improve and enhance th
 6. Open a supported Level Access Platform page.
 
 ## Disabling The Script
+
 1. Open a supported Level Access Platform page.
 2. Open Tampermonkey from your list of active extensions.
 3. Toggle the active script ("Level Access Platform Script") to off.
