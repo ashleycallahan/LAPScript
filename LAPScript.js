@@ -352,6 +352,11 @@ body.review-mode-findings .main-content-container .main-content:focus {
 body.review-mode-findings .table-responsive {
     overflow-x: visible;
 }
+body.review-mode-findings .table-responsive table > thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
     `);
 })();
 (function() {
