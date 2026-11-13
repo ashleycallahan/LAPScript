@@ -373,6 +373,9 @@ body.review-mode-findings .table-responsive table > thead {
             let jsonResponse;
             if (contentType && contentType.indexOf('application/json') !== -1) {
                 jsonResponse = JSON.parse(this.responseText);
+                if (typeof jsonResponse.authToken === 'object') {
+                    window.token = jsonResponse.authToken;
+                }
                 if (typeof jsonResponse.items === 'object' && jsonResponse.items.length > 0) {
                     window.digitalProperties = jsonResponse.items;
                     if (window.getAllPropertiesDone) {
@@ -598,12 +601,11 @@ body.review-mode-findings .table-responsive table > thead {
     window.getAllProperties = function() {
         if (typeof window.getAllPropertiesDone === 'undefined') {
             window.getAllPropertiesDone = true;
-            let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
             const xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/v1/user/digital-properties', true);
             xhr.responseType = 'text';
-            if (typeof token !== 'undefined') {
-                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            if (typeof window.getToken() !== 'undefined') {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + window.getToken());
             }
             xhr.onerror = function() {};
             xhr.send();
@@ -615,12 +617,11 @@ body.review-mode-findings .table-responsive table > thead {
     window.getAllManualAudits = function() {
         if (typeof window.getAllManualAuditsDone === 'undefined') {
             window.getAllManualAuditsDone = true;
-            let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
             const xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/v1/admin/manual-audit?limit=200', true);
             xhr.responseType = 'text';
-            if (typeof token !== 'undefined') {
-                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            if (typeof window.getToken() !== 'undefined') {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + window.getToken());
             }
             xhr.onerror = function() {};
             xhr.send();
@@ -635,7 +636,6 @@ body.review-mode-findings .table-responsive table > thead {
         }
     }
     window.getNextFinding = function(i, lastId) {
-        let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
         const xhr = new XMLHttpRequest();
         let thisAudit = window.manualAudits[i];
         let thisAuditId = thisAudit._id;
@@ -649,8 +649,8 @@ body.review-mode-findings .table-responsive table > thead {
         if (typeof thisAuditId !== 'undefined' && (typeof thisAudit.workspace !== 'undefined' && typeof thisAudit.workspace._id !== 'undefined') && (typeof thisAudit.digitalProperty !== 'undefined' && typeof thisAudit.digitalProperty._id !== 'undefined')) {
             xhr.open('GET', '/api/v1/workspaces/' + thisAudit.workspace._id + '/digital-property/' + thisAudit.digitalProperty._id + '/manual-evaluations/' + thisAuditId + '/manual-results' + lastIdStr, true);
             xhr.responseType = 'text';
-            if (typeof token !== 'undefined') {
-                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            if (typeof window.getToken() !== 'undefined') {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + window.getToken());
             }
             xhr.onerror = function() {};
             xhr.send();
@@ -787,13 +787,22 @@ body.review-mode-findings .table-responsive table > thead {
             }
         }
     }
+    window.getToken = function() {
+        let token;
+        if (localStorage.getItem('Level Access Platform') !== null) {
+            token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
+        }
+        if (typeof window.token !== 'undefined') {
+            token = window.token;
+        }
+        return token;
+    }
     window.getScreenImg = function(pageLink, url) {
-        let token = JSON.parse(localStorage.getItem('Level Access Platform')).accessToken;
         const xhr = new XMLHttpRequest();
         xhr.open('GET', '/api/v1/secure-download/' + url, true);
         xhr.responseType = 'blob';
-        if (typeof token !== 'undefined') {
-            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        if (typeof window.getToken() !== 'undefined') {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + window.getToken());
         }
         xhr.onload = function() {
             if (this.status === 200) {
