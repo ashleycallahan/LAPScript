@@ -7,6 +7,7 @@
 // @match        *.essentia11y.com/*
 // @match        *.levelaccess.io/*
 // @match        *.essentialaccessibility.com/*
+// @match        *.hub.us.levelaccess.net/*
 // @updateURL    https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
 // @downloadURL  https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
 // @supportURL   https://github.com/ashleycallahan/LAPScript/issues
@@ -148,6 +149,20 @@ app-admin-manual-audits table table-cell-text > span a:not(.review-mode-link-add
 app-manual-evaluation-screens-evaluated table table-cell-link > div a:not(.review-mode-link-added),
 app-manual-eval-findings-table table table-cell-link > div a:not(.review-mode-link-added) {
     flex: 1 1 auto;
+}
+app-admin-manual-audits table .dropdown-cell .btn,
+app-manual-evaluations-table table .dropdown-cell .btn,
+app-admin-manual-audits table [class*="scoping-"] span,
+app-manual-evaluations-table table [class*="scoping-"] span {
+    font-size: 14px;
+}
+app-admin-manual-audits table .dropdown-cell .btn,
+app-manual-evaluations-table table .dropdown-cell .btn {
+    padding: 0 !important;
+}
+app-admin-manual-audits table td[style*="align: center"],
+app-manual-evaluations-table table td[style*="align: center"] {
+    text-align: left !important;
 }
 app-manual-eval-findings-table table a[routerlink] {
     white-space: nowrap;
@@ -296,9 +311,9 @@ dialog.review-mode-lightbox .thumbnails img {
     height: 50px;
     width: 50px;
 }
-app-manual-audits .card-body .me-auto {
+/*app-manual-audits .card-body .me-auto {
     width: 100%;
-}
+}*/
 details.review-mode-search {
     margin: 0 0 25px 0;
     min-width: 40vw;
