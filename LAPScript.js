@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.21
+// @version      1.1.22
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
 // @match        *.levelaccess.io/*
 // @match        *.essentialaccessibility.com/*
 // @match        *.hub.us.levelaccess.net/*
-// @updateURL    https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
-// @downloadURL  https://raw.githubusercontent.com/ashleycallahan/LAPScript/refs/heads/main/LAPScript.js
+// @updateURL    https://raw.githubusercontent.com/ashleycallahan/LAPScript/main/LAPScript.js
+// @downloadURL  https://raw.githubusercontent.com/ashleycallahan/LAPScript/main/LAPScript.js
 // @supportURL   https://github.com/ashleycallahan/LAPScript/issues
-// @icon         https://dashboard.essentialaccessibility.com/static/assets/images/favicon.ico
+// @icon         https://dashboard.us.levelaccess.net/static/assets/images/favicon.ico
 // @grant        GM_addStyle
 // @require      https://code.jquery.com/jquery-4.0.0.min.js
 // ==/UserScript==
