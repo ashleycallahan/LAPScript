@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.23
+// @version      1.1.24
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -386,7 +386,7 @@ body.review-mode-findings .table-responsive table > thead {
             const contentType = this.getResponseHeader('Content-Type');
             const url = event.target.responseURL;
             let jsonResponse;
-            if (contentType && contentType.indexOf('application/json') !== -1) {
+            if (contentType && contentType.indexOf('application/json') !== -1 && this.responseType === 'text') {
                 jsonResponse = JSON.parse(this.responseText);
                 if (typeof jsonResponse.authToken === 'object') {
                     window.token = jsonResponse.authToken;
