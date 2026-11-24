@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.22
+// @version      1.1.23
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -445,8 +445,21 @@ body.review-mode-findings .table-responsive table > thead {
                         window.searchFindings();
                     }
                 }
-                if (typeof jsonResponse.scope === 'object' && typeof jsonResponse.scope.pages === 'object' && jsonResponse.scope.pages.length > 0) {
-                    window.screens = jsonResponse.scope.pages;
+                if ((typeof jsonResponse.scope === 'object' && typeof jsonResponse.scope.pages === 'object' && jsonResponse.scope.pages.length > 0) || (typeof jsonResponse.pages === 'object' && jsonResponse.pages.length > 0)) {
+                    if (typeof window.screens === 'undefined') {
+                        window.screens = [];
+                    }
+                    if (typeof jsonResponse.scope === 'object' && typeof jsonResponse.scope.pages === 'object' && jsonResponse.scope.pages.length > 0) {
+                        window.screens = jsonResponse.scope.pages;
+                    }
+                    if (typeof jsonResponse.pages === 'object' && jsonResponse.pages.length > 0) {
+                        for (let i = 0; i < jsonResponse.pages.length; i++) {
+                            let thisObj = {page: jsonResponse.pages[i]};
+                            if (!window.screens.some(thisScreen => thisScreen.page.name === jsonResponse.pages[i].name)) {
+                                window.screens.push(thisObj);
+                            }
+                        }
+                    }
                     if (url.indexOf('/manual-evaluations/') !== -1 && url.indexOf('/workspaces/') !== -1 && url.indexOf('/digital-property/') !== -1) {
                         window.screens.workspace = url.split('/workspaces/')[1].split('/digital-property/')[0];
                         window.screens.digitalProperty = url.split('/digital-property/')[1].split('/manual-evaluations/')[0];
@@ -766,7 +779,9 @@ body.review-mode-findings .table-responsive table > thead {
         });
         for (let i = 0; i < window.screens.length; i++) {
             if (typeof window.screens[i].page !== 'undefined' && typeof window.screens[i].page.name !== 'undefined') {
-                let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink]:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '), app-manual-eval-pages-table table-cell-text:contains(' + window.screens[i].page.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')').first();
+                let pageLink = $('app-manual-evaluation-screens-evaluated a[routerlink], app-manual-eval-pages-table table-cell-text').filter(function() {
+                    return ($(this).text().trim() === window.screens[i].page.name)
+                });
                 if (pageLink.length > 0 && $(pageLink).parent().find('.review-mode-added').length === 0) {
                     $(pageLink).addClass('review-mode-added');
                     if (typeof window.screens[i].page.screenshot !== 'undefined' && typeof window.screens[i].page.screenshot.src !== 'undefined') {
