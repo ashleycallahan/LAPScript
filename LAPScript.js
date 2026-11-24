@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Level Access Platform Script
 // @namespace    http://tampermonkey.net/
-// @version      1.1.24
+// @version      1.1.25
 // @description  Level Access Platform Script
 // @author       Ashley Callahan
 // @match        *.essentia11y.com/*
@@ -463,7 +463,12 @@ body.review-mode-findings .table-responsive table > thead {
                     if (url.indexOf('/manual-evaluations/') !== -1 && url.indexOf('/workspaces/') !== -1 && url.indexOf('/digital-property/') !== -1) {
                         window.screens.workspace = url.split('/workspaces/')[1].split('/digital-property/')[0];
                         window.screens.digitalProperty = url.split('/digital-property/')[1].split('/manual-evaluations/')[0];
-                        window.screens.auditId = url.split('/manual-evaluations/')[1];
+                        window.screens.auditId = url.split('/manual-evaluations/')[1].split('/')[0];
+                    }
+                    if (url.indexOf('/manual-audit/') !== -1 && url.indexOf('/workspaces/') !== -1 && url.indexOf('/digital-property/') !== -1) {
+                        window.screens.workspace = url.split('/workspaces/')[1].split('/digital-property/')[0];
+                        window.screens.digitalProperty = url.split('/digital-property/')[1].split('/manual-audit/')[0];
+                        window.screens.auditId = url.split('/manual-audit/')[1].split('/')[0];
                     }
                 }
             }
@@ -514,7 +519,7 @@ body.review-mode-findings .table-responsive table > thead {
             if ($('app-manual-eval-pages-table').find('table-cell-text').length > 0) {
                 //observer.disconnect();
                 if ($('.review-mode-open-evaluation').length === 0 && $('[data-test-id="evaluation-name"]').length > 0) {
-                    $('[data-test-id="evaluation-name"] input').after('<a href="' + window.location.href.split('/edit')[0] + '" target="_blank" class="review-mode-open-evaluation review-mode-link-added"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 640 640" role="img" aria-label="Open ' + $('[data-test-id="evaluation-name"] input')[0].value + ' in a new tab"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M354.4 83.8C359.4 71.8 371.1 64 384 64L544 64C561.7 64 576 78.3 576 96L576 256C576 268.9 568.2 280.6 556.2 285.6C544.2 290.6 530.5 287.8 521.3 278.7L464 221.3L310.6 374.6C298.1 387.1 277.8 387.1 265.3 374.6C252.8 362.1 252.8 341.8 265.3 329.3L418.7 176L361.4 118.6C352.2 109.4 349.5 95.7 354.5 83.7zM64 240C64 195.8 99.8 160 144 160L224 160C241.7 160 256 174.3 256 192C256 209.7 241.7 224 224 224L144 224C135.2 224 128 231.2 128 240L128 496C128 504.8 135.2 512 144 512L400 512C408.8 512 416 504.8 416 496L416 416C416 398.3 430.3 384 448 384C465.7 384 480 398.3 480 416L480 496C480 540.2 444.2 576 400 576L144 576C99.8 576 64 540.2 64 496L64 240z"/></svg></a>');
+                    $('[data-test-id="evaluation-name"] input').after('<a href="/manual-evaluations/' + window.screens.auditId + '/conformance?workspaceId=' + window.screens.workspace + '&digitalPropertyId=' + window.screens.digitalProperty + '" target="_blank" class="review-mode-open-evaluation review-mode-link-added"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 640 640" role="img" aria-label="Open ' + $('[data-test-id="evaluation-name"] input')[0].value + ' in a new tab"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M354.4 83.8C359.4 71.8 371.1 64 384 64L544 64C561.7 64 576 78.3 576 96L576 256C576 268.9 568.2 280.6 556.2 285.6C544.2 290.6 530.5 287.8 521.3 278.7L464 221.3L310.6 374.6C298.1 387.1 277.8 387.1 265.3 374.6C252.8 362.1 252.8 341.8 265.3 329.3L418.7 176L361.4 118.6C352.2 109.4 349.5 95.7 354.5 83.7zM64 240C64 195.8 99.8 160 144 160L224 160C241.7 160 256 174.3 256 192C256 209.7 241.7 224 224 224L144 224C135.2 224 128 231.2 128 240L128 496C128 504.8 135.2 512 144 512L400 512C408.8 512 416 504.8 416 496L416 416C416 398.3 430.3 384 448 384C465.7 384 480 398.3 480 416L480 496C480 540.2 444.2 576 400 576L144 576C99.8 576 64 540.2 64 496L64 240z"/></svg></a>');
                 }
                 if ($('.review-mode-added').length === 0) {
                     window.addScreenImg();
@@ -522,7 +527,7 @@ body.review-mode-findings .table-responsive table > thead {
             }
             let renameBtn = $('app-manual-evaluation > .card > .card-body button:contains("Rename")');
             if (renameBtn.length > 0 && $('.review-mode-view-scope').length === 0) {
-                renameBtn.after('<a href="/manual-evaluations/' + window.screens.auditId + '/edit' + window.location.search + '&workspaceId=' + window.screens.workspace + '&digitalPropertyId=' + window.screens.digitalProperty + '" target="_blank" class="review-mode-view-scope review-mode-btn btn btn-link no-padding margin-right"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" fill="currentColor"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M104 112C90.7 112 80 122.7 80 136L80 184C80 197.3 90.7 208 104 208L152 208C165.3 208 176 197.3 176 184L176 136C176 122.7 165.3 112 152 112L104 112zM256 128C238.3 128 224 142.3 224 160C224 177.7 238.3 192 256 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L256 128zM256 288C238.3 288 224 302.3 224 320C224 337.7 238.3 352 256 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L256 288zM256 448C238.3 448 224 462.3 224 480C224 497.7 238.3 512 256 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L256 448zM80 296L80 344C80 357.3 90.7 368 104 368L152 368C165.3 368 176 357.3 176 344L176 296C176 282.7 165.3 272 152 272L104 272C90.7 272 80 282.7 80 296zM104 432C90.7 432 80 442.7 80 456L80 504C80 517.3 90.7 528 104 528L152 528C165.3 528 176 517.3 176 504L176 456C176 442.7 165.3 432 152 432L104 432z"/></svg> View Scope</button>');
+                renameBtn.after('<a href="/manual-evaluations/' + window.screens.auditId + '/edit?workspaceId=' + window.screens.workspace + '&digitalPropertyId=' + window.screens.digitalProperty + '" target="_blank" class="review-mode-view-scope review-mode-btn btn btn-link no-padding margin-right"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" fill="currentColor"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M104 112C90.7 112 80 122.7 80 136L80 184C80 197.3 90.7 208 104 208L152 208C165.3 208 176 197.3 176 184L176 136C176 122.7 165.3 112 152 112L104 112zM256 128C238.3 128 224 142.3 224 160C224 177.7 238.3 192 256 192L544 192C561.7 192 576 177.7 576 160C576 142.3 561.7 128 544 128L256 128zM256 288C238.3 288 224 302.3 224 320C224 337.7 238.3 352 256 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L256 288zM256 448C238.3 448 224 462.3 224 480C224 497.7 238.3 512 256 512L544 512C561.7 512 576 497.7 576 480C576 462.3 561.7 448 544 448L256 448zM80 296L80 344C80 357.3 90.7 368 104 368L152 368C165.3 368 176 357.3 176 344L176 296C176 282.7 165.3 272 152 272L104 272C90.7 272 80 282.7 80 296zM104 432C90.7 432 80 442.7 80 456L80 504C80 517.3 90.7 528 104 528L152 528C165.3 528 176 517.3 176 504L176 456C176 442.7 165.3 432 152 432L104 432z"/></svg> View Scope</button>');
             }
 
         };
